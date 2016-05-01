@@ -83,6 +83,8 @@ void main() {
         if(!(EP1OUTCS & bmEPBUSY))
         {
            ProcessRecvData();
+           toggle_pins();
+
         }
 
         // Timer expiration; send buffered data
@@ -90,7 +92,6 @@ void main() {
         {
            ProcessXmitData();
         }
-        toggle_pins();
 
 
 
