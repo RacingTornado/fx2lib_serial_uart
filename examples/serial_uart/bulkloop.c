@@ -43,6 +43,7 @@ __bit on;
 extern void uart_config();
 extern void ProcessXmitData();
 extern void ProcessRecvData();
+extern void toggle_pins();
 
 void main() {
 
@@ -61,7 +62,7 @@ void main() {
 
     //SETCPUFREQ(CLK_48M);
     //SETIF48MHZ();
-    //sio0_init(57600);
+    sio0_init(57600);
 
     //Enable USB auto vectored interrupts
     USE_USB_INTS();
@@ -72,7 +73,7 @@ void main() {
     EA=1; // global interrupt enable
     while(TRUE) {
 
-        //Custom handler to get the USB data and send it out
+        //Handles device descriptor requests
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -89,7 +90,7 @@ void main() {
         {
            ProcessXmitData();
         }
-
+        toggle_pins();
 
 
 

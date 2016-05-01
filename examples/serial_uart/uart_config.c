@@ -48,7 +48,7 @@ unsigned int latency_us=40000;
 }
 
 
- void putchar(char c)
+ void putchar_a(char c)
 {
  __xdata unsigned char *dest=EP1INBUF + bytes_waiting_for_xmit + 2;
 
@@ -344,9 +344,9 @@ void uart_config()
 	for(i=0; i<len; i++,src++)
 	   {
 	      if(*src>='a' && *src<='z')
-		 {  putchar(*src-'a'+'A');  }
+		 {  putchar_a(*src-'a'+'A');  }
 	      else
-		 {  putchar(*src);  }
+		 {  putchar_a(*src);  }
 	   }
 
 	EP1OUTBC=0xff; // re-arm endpoint 1 for OUT (host->device) transfers
@@ -354,6 +354,17 @@ void uart_config()
 }
 
 
+void toggle_pins()
+{
+  OEA=0x01;
+  SYNCDELAY;
+  __asm
+  CPL 0x80;
+  __endasm;
+  SYNCDELAY;
+
+
+}
 
 
 
