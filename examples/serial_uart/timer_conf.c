@@ -128,16 +128,16 @@ void conf_timer(DWORD baud,CLK_SPD cpu_clk)
 
 
 
-void configure_timer()
+void configure_timer() __critical
 {
  TMOD |= 0x20;
  SYNCDELAY;
- TCON |= 0x40;
- SYNCDELAY;
- ENABLE_TIMER1();
  TR1 = 0;
+ SYNCDELAY;
  TH1 = reload_value;
- TL1 = reload_value;
+ SYNCDELAY;
+ TL1 = 0x23;
+ SYNCDELAY;
 
 
 }
@@ -148,14 +148,9 @@ void start_timer()
 {
 
     TR1=1;
+    SYNCDELAY;
 
 }
 
-void timer1_isr() __interrupt TF1_ISR
 
-{
-
- toggle_pins();
-
-}
 

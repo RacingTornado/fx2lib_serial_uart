@@ -25,6 +25,7 @@
 #include <lights.h>
 #include <setupdat.h>
 #include <eputils.h>
+#include <fx2ints.h>
 
 
 #define SYNCDELAY SYNCDELAY4
@@ -62,6 +63,7 @@ void main() {
     uart_config();
     configure_timer();
     start_timer();
+    ENABLE_TIMER1();
     //d();
 
     //SETCPUFREQ(CLK_48M);
@@ -76,7 +78,7 @@ void main() {
     ENABLE_USBRESET();
     EA=1; // global interrupt enable
     while(TRUE) {
-
+        //toggle_pins();
         //Handles device descriptor requests
         if ( got_sud ) {
         handle_setupdata();
@@ -86,7 +88,7 @@ void main() {
         // Input data on EP1
         if(!(EP1OUTCS & bmEPBUSY))
         {
-           ProcessRecvData();
+           //ProcessRecvData();
            toggle_pins();
 
         }
@@ -94,7 +96,7 @@ void main() {
         // Timer expiration; send buffered data
         if((TCON & 0x20))
         {
-           ProcessXmitData();
+           //ProcessXmitData();
         }
 
 
@@ -206,5 +208,9 @@ void usbreset_isr() __interrupt USBRESET_ISR {
 void hispeed_isr() __interrupt HISPEED_ISR {
     handle_hispeed(TRUE);
     CLEAR_HISPEED();
+}
+void timer1_isr() __interrupt TF1_ISR
+{
+toggle_pins();
 }
 
