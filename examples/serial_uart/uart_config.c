@@ -187,7 +187,7 @@ void uart_config()
 
 
 
-    //The other 3 LSB bits are for memeory access stretch
+    //The other 3 LSB bits are for memory access stretch
     /*
     ╔═════════╤══════════════════════════════════════════════════════════════╗
     ║ Bit     │ Function                                                     ║
@@ -212,7 +212,6 @@ void uart_config()
 
 
 
-    //I dont know if this can be bit address since in fx2regs.h , there doesnt seem to be split up
     CKCON &= ~(0x08);
     /*
     ╔════════╤═══════════════════════════════════════════════════════════════════════════╗

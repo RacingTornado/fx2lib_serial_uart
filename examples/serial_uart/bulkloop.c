@@ -44,6 +44,8 @@ extern void uart_config();
 extern void ProcessXmitData();
 extern void ProcessRecvData();
 extern void toggle_pins();
+extern void configure_timer();
+extern void start_timer();
 
 void main() {
 
@@ -58,6 +60,8 @@ void main() {
     RENUMERATE_UNCOND();
     //Call our custom function to do our UART init
     uart_config();
+    configure_timer();
+    start_timer();
     //d();
 
     //SETCPUFREQ(CLK_48M);

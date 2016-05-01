@@ -5,7 +5,7 @@
 #include <delay.h>
 #include <setupdat.h>
 
-
+#define SYNCDELAY SYNCDELAY4
 
 #define BAUD_57600 57600
 #define BAUD_38400 38400
@@ -15,43 +15,44 @@
 #define BAUD_4800  4800
 #define BAUD_2400  2400
 
+static BYTE reload_value= 0;
+extern void toggle_pins();
 
-
-void conf_timer(DWORD baud)
+void conf_timer(DWORD baud,CLK_SPD cpu_clk)
 {
 
- switch(CPU_CLK)
+ switch(cpu_clk)
  {
     case CLK_12M:
     switch(baud)
     {
     case BAUD_57600:
-     reload_val = 0xfd;
+     reload_value = 0xfd;
      break;
     case BAUD_38400:
-     reload_val = 0xfb;
+     reload_value = 0xfb;
      break;
     case BAUD_28800:
-     reload_val = 0xf9;
+     reload_value = 0xf9;
      break;
     case BAUD_19200:
-     reload_val = 0xf6;
+     reload_value = 0xf6;
      break;
     case BAUD_9600:
-     reload_val= 0xec;
+     reload_value= 0xec;
      break;
     case BAUD_4800:
-     reload_val=d9;
+     reload_value=0xd9;
      break;
     case BAUD_2400:
-     reload_val = 0xb2;
+     reload_value = 0xb2;
      break;
     default:
      reload_value = 0x00;
 
 
     }
-    case CLK_24:
+    case CLK_24M:
     {
     switch(baud)
     {
@@ -129,10 +130,32 @@ void conf_timer(DWORD baud)
 
 void configure_timer()
 {
-
+ TMOD |= 0x20;
+ SYNCDELAY;
+ TCON |= 0x40;
+ SYNCDELAY;
+ ENABLE_TIMER1();
+ TR1 = 0;
+ TH1 = reload_value;
+ TL1 = reload_value;
 
 
 }
 
 
+
+void start_timer()
+{
+
+    TR1=1;
+
+}
+
+void timer1_isr() __interrupt TF1_ISR
+
+{
+
+ toggle_pins();
+
+}
 
