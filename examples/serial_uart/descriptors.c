@@ -1,7 +1,7 @@
 
 #include "descriptors.h"
 
-__code __at(DSCR_AREA) struct usb_descriptors code_descriptors = {
+__code __at(0x3e00) struct usb_descriptors code_descriptors = {
 	.device = {
 		.bLength		= USB_DT_DEVICE_SIZE,
 		.bDescriptorType	= USB_DT_DEVICE,
@@ -10,8 +10,8 @@ __code __at(DSCR_AREA) struct usb_descriptors code_descriptors = {
 		.bDeviceSubClass	= USB_SUBCLASS_VENDOR_SPEC,
 		.bDeviceProtocol	= 0xff,
 		.bMaxPacketSize0	= 64,
-		.idVendor		= 0x1d50,
-		.idProduct		= 0x60B7,
+		.idVendor		= 0x0403,
+		.idProduct		= 0x8372,
 		.bcdDevice		= 0x0001,
 		.iManufacturer		= USB_STRING_INDEX(0),
 		.iProduct		= USB_STRING_INDEX(1),

@@ -45,7 +45,7 @@ USE_16K := 1
 # Must only be hex numbers
 FIRMWARE_VERSION := $(shell date +%Y%m%d)
 
-CC_SRCS := bulkloop.c descriptors.c
+CC_SRCS := bulkloop.c uart_config.c descriptors.c
 #Remove the assembly file now
 #AS_SRCS := descriptors_hdmi2usb.a51
 CC_OBJS := $(CC_SRCS:%.c=%.rel)
@@ -58,7 +58,7 @@ AS := $(AS8051)
 CFLAGS += -DDATE=0x$(FIRMWARE_VERSION) -mmcs51 $(FLAGS)
 
 ifeq ($(USE_16K),1)
-	CFLAGS += --code-size 0x3e00 --xram-size 0x0200  -Wl"-b INT2JT=0x3d00"
+	CFLAGS += --code-size 0x3e00 --xram-size 0x0200 -Wl"-b DSCR_AREA=0x2e00" -Wl"-b INT2JT=0x3d00"
 else
 	CFLAGS += --code-size 0x1e00 --xram-size 0x0200 -Wl"-b DSCR_AREA=0x1e00" -Wl"-b INT2JT=0x1f00"
 endif
@@ -118,8 +118,7 @@ check: check_int2jt
 clean:
 	$(Q_RM)$(RM) *.iic *.asm *.lnk *.lst *.map *.mem *.rel *.rst *.sym \
 		*.lk progOffsets.h firmware.hex date.inc
-	rm -f $(foreach ext, a51 asm ihx lnk lk lst map mem rel rst rest sym adb cdb bix, build/*.${ext})
-	
+	cd $(FX2LIBDIR) && make clean
 
 distclean: clean
 	$(RM) -r $(FX2LIBDIR)

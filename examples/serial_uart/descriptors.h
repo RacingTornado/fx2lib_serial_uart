@@ -7,7 +7,7 @@
 
 #ifndef DESCRIPTORS_H_
 #define DESCRIPTORS_H_
-#define DSCR_AREA 0x3e00
+
 struct usb_section {
 	struct usb_config_descriptor config;
 	struct usb_interface_descriptor interface;

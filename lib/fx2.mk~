@@ -49,6 +49,7 @@ XRAM_LOC?=--xram-loc 0x3c00
 BUILDDIR?=build
 
 FX2LIBDIR?=$(dir $(lastword $(MAKEFILE_LIST)))../
+$(info $(MAKEFILE_LIST))
 RELS=$(addprefix $(BUILDDIR)/, $(addsuffix .rel, $(notdir $(basename $(SOURCES) $(A51_SOURCES)))))
 # these are pretty good settings for most firmwares.  
 # Have to be careful with memory locations for 

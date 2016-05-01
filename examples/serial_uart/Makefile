@@ -45,7 +45,7 @@ USE_16K := 1
 # Must only be hex numbers
 FIRMWARE_VERSION := $(shell date +%Y%m%d)
 
-CC_SRCS := bulkloop.c descriptors.c
+CC_SRCS := bulkloop.c uart_config.c descriptors.c
 #Remove the assembly file now
 #AS_SRCS := descriptors_hdmi2usb.a51
 CC_OBJS := $(CC_SRCS:%.c=%.rel)
@@ -118,8 +118,7 @@ check: check_int2jt
 clean:
 	$(Q_RM)$(RM) *.iic *.asm *.lnk *.lst *.map *.mem *.rel *.rst *.sym \
 		*.lk progOffsets.h firmware.hex date.inc
-	rm -f $(foreach ext, a51 asm ihx lnk lk lst map mem rel rst rest sym adb cdb bix, build/*.${ext})
-	
+	cd $(FX2LIBDIR) && make clean
 
 distclean: clean
 	$(RM) -r $(FX2LIBDIR)
