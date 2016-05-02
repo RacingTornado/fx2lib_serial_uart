@@ -259,6 +259,7 @@ void timer1_isr() __interrupt TF1_ISR
 			    //Send out the data bit
 			    //Maybe use some assembly here later
 				set_tx_pin_high();
+				//toggle_pins();
 			}
 			else {
                 //Send data bit out

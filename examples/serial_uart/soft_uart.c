@@ -430,11 +430,20 @@ unsigned char get_rx_pin_status()
 
 void set_tx_pin_high()
 {
-SOFTUART_TXBIT = 1;
+//SOFTUART_TXBIT = 1;
+//PA0 = 1;
+IOA = 0x01;
+SYNCDELAY;
 }
 
 
 void set_tx_pin_low()
 {
-SOFTUART_TXBIT=0;
+//SOFTUART_TXBIT=0;
+IOA=0x00;
+__asm
+mov 0xb2, #0x01
+mov 0x80, #0x00
+__endasm;
+SYNCDELAY;
 }
