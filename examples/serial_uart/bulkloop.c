@@ -112,7 +112,7 @@ void main() {
     while(TRUE) {
         //toggle_pins();
         //Handles device descriptor requests
-        softuart_putchar(0x11);
+        softuart_putchar(0x3c);
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
