@@ -171,22 +171,21 @@ V0.4 (10/2010)
 
 // startbit and stopbit parsed internally (see ISR)
 #define RX_NUM_OF_BITS (8)
-volatile static char           inbuf[SOFTUART_IN_BUF_SIZE];
-volatile static unsigned char  qin;
-static unsigned char           qout;
-volatile static unsigned char  flag_rx_off;
-volatile static unsigned char  flag_rx_ready;
+volatile  char           inbuf[SOFTUART_IN_BUF_SIZE];
+volatile  unsigned char  qin;
+unsigned char           qout;
+volatile  unsigned char  flag_rx_off;
+volatile  unsigned char  flag_rx_ready;
 
 // 1 Startbit, 8 Databits, 1 Stopbit = 10 Bits/Frame
 #define TX_NUM_OF_BITS (10)
-volatile static unsigned char  flag_tx_busy;
-volatile static unsigned char  timer_tx_ctr;
-volatile static unsigned char  bits_left_in_tx;
-volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
+volatile  unsigned char  flag_tx_busy;
+volatile  unsigned char  timer_tx_ctr;
+volatile  unsigned char  bits_left_in_tx;
+volatile  unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
-#define set_tx_pin_high()      ( SOFTUART_TXPORT |=  ( 1 << SOFTUART_TXBIT ) )
-#define set_tx_pin_low()       ( SOFTUART_TXPORT &= ~( 1 << SOFTUART_TXBIT ) )
-#define get_rx_pin_status()    ( SOFTUART_RXPIN  &   ( 1 << SOFTUART_RXBIT ) )
+extern void set_tx_pin_high();
+//#define get_rx_pin_status()    ( SOFTUART_RXBIT )
 
 //ISR(SOFTUART_T_COMP_LABEL)
 //{
@@ -202,20 +201,29 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 //
 //	// Transmitter Section
 //	if ( flag_tx_busy == SU_TRUE ) {
+//
+//        //There is data to transmit. The data is located in the buffer
+//        //The timer runs 3 times faster. Decrement it each time
 //		tmp = timer_tx_ctr;
 //		if ( --tmp == 0 ) { // if ( --timer_tx_ctr <= 0 )
 //			if ( internal_tx_buffer & 0x01 ) {
+//			    //Send out the data bit
+//			    //Maybe use some assembly here later
 //				set_tx_pin_high();
 //			}
 //			else {
+//                //Send data bit out
 //				set_tx_pin_low();
 //			}
+//			//Right shift and move out the data which has been sent out
 //			internal_tx_buffer >>= 1;
 //			tmp = 3; // timer_tx_ctr = 3;
 //			if ( --bits_left_in_tx == 0 ) {
+//                //Finished trasmitting
 //				flag_tx_busy = SU_FALSE;
 //			}
 //		}
+//		//Assign thevalue back
 //		timer_tx_ctr = tmp;
 //	}
 //
@@ -225,6 +233,7 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 //			if ( --timer_rx_ctr == 0 ) {
 //				flag_rx_waiting_for_stop_bit = SU_FALSE;
 //				flag_rx_ready = SU_FALSE;
+//				//put in into the buffer
 //				inbuf[qin] = internal_rx_buffer;
 //				if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
 //					// overflow - reset inbuf-index
@@ -236,8 +245,11 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 //			if ( flag_rx_ready == SU_FALSE ) {
 //				start_bit = get_rx_pin_status();
 //				// test for start bit
+//				//If the start bit is low then begin reading data
 //				if ( start_bit == 0 ) {
+//                    //Set rx_ready to indicate that the receiver is now in operation
 //					flag_rx_ready      = SU_TRUE;
+//					//Initialize buffer and rx counter
 //					internal_rx_buffer = 0;
 //					timer_rx_ctr       = 4;
 //					bits_left_in_rx    = RX_NUM_OF_BITS;
@@ -251,10 +263,12 @@ volatile static unsigned short internal_tx_buffer; /* ! mt: was type uchar - thi
 //					tmp = 3;
 //					flag_in = get_rx_pin_status();
 //					if ( flag_in ) {
+//                        //if it is a on then or it with RXMASK
 //						internal_rx_buffer |= rx_mask;
 //					}
 //					rx_mask <<= 1;
 //					if ( --bits_left_in_rx == 0 ) {
+//                        //wait for stop bit
 //						flag_rx_waiting_for_stop_bit = SU_TRUE;
 //					}
 //				}
@@ -346,7 +360,7 @@ void softuart_turn_rx_off( void )
 char softuart_getchar( void )
 {
 	char ch;
-
+    //Read back the data
 	while ( qout == qin ) {
 		idle();
 	}
@@ -376,6 +390,7 @@ unsigned char softuart_transmit_busy( void )
 
 void softuart_putchar( const char ch )
 {
+    //Keep waiting till current transmission is complete
 	while ( flag_tx_busy == SU_TRUE ) {
 		; // wait for transmitter ready
 		  // add watchdog-reset here if needed;
@@ -383,8 +398,11 @@ void softuart_putchar( const char ch )
 
 	// invoke_UART_transmit
 	timer_tx_ctr       = 3;
+	//Set the number of bits to 10.
 	bits_left_in_tx    = TX_NUM_OF_BITS;
+	//This is to construct the 10 bits which will be sent out via serial
 	internal_tx_buffer = ( ch << 1 ) | 0x200;
+	//The tx_busy flag indicates that a transmit is in progress
 	flag_tx_busy       = SU_TRUE;
 }
 
@@ -404,3 +422,19 @@ void softuart_puts_p( const char *prg_s )
 //	}
 }
 
+unsigned char get_rx_pin_status()
+{
+  return SOFTUART_RXBIT;
+}
+
+
+void set_tx_pin_high()
+{
+SOFTUART_TXBIT = 1;
+}
+
+
+void set_tx_pin_low()
+{
+SOFTUART_TXBIT=0;
+}
