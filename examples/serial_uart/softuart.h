@@ -11,10 +11,12 @@
 #define SOFTUART_RXPIN   IOA
 #define SOFTUART_RXDDR   OEA
 #define SOFTUART_RXBIT   PA1
+#define SOFTUART_RXBITNO 2
 
 #define SOFTUART_TXPORT  IOA
 #define SOFTUART_TXDDR   OEA
 #define SOFTUART_TXBIT   PA0
+#define SOFTUART_TXBITNO  1
 
 #define SOFTUART_T_COMP_LABEL      TIM0_COMPA_vect
 #define SOFTUART_T_COMP_REG        OCR0A
@@ -85,3 +87,4 @@ void softuart_puts_p( const char *prg_s );
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
 #define softuart_puts_P(s___) softuart_puts_p(PSTR(s___))
+#endif

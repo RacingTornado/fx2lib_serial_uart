@@ -114,7 +114,8 @@ static void Initialize(void)
 	// this lets me use the smallest numbers for our counter (i.e,
 	// 40000 for the default 40 ms latency); the counter is only
 	// sixteen bits.
-
+    CPUCS=0x10;
+    SYNCDELAY;
 	IFCONFIG=0xc0;  // Internal IFCLK, 48MHz; A,B as normal ports.
 	SYNCDELAY;
 	//Chip Revision Control Register

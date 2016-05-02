@@ -47,6 +47,7 @@ extern void ProcessRecvData();
 extern void toggle_pins();
 extern void configure_timer();
 extern void start_timer();
+extern void timer_init();
 
 void main() {
 
@@ -61,7 +62,8 @@ void main() {
     RENUMERATE_UNCOND();
     //Call our custom function to do our UART init
     uart_config();
-    configure_timer();
+    //configure_timer();
+    timer_init();
     start_timer();
     ENABLE_TIMER1();
     //d();
