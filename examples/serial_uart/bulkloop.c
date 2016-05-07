@@ -139,6 +139,7 @@ void main() {
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
         //uart_rx_fill();
+        softuart_putchar(0x3d);
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -276,7 +277,105 @@ void timer1_isr() __interrupt TF1_ISR
 //get_rx_pin_status();
 //toggle_port_value(0xb0,1);
 	// Transmitter Section
-	if ( flag_tx_busy == SU_TRUE ) {
+//	if ( flag_tx_busy == SU_TRUE ) {
+//
+//        //There is data to transmit. The data is located in the buffer
+//        //The timer runs 3 times faster. Decrement it each time
+//		//tmp = timer_tx_ctr;
+//		if ( --timer_tx_ctr <= 0 ){
+//			if ( internal_tx_buffer & 0x01 ) {
+//			    //Send out the data bit
+//			    //Maybe use some assembly here later
+//				set_tx_pin_high();
+//				//toggle_pins();
+//			}
+//			else {
+//                //Send data bit out
+//				set_tx_pin_low();
+//			}
+//			//Right shift and move out the data which has been sent out
+//			internal_tx_buffer >>= 1;
+//            timer_tx_ctr = 3;
+//			if ( --bits_left_in_tx == 0 ) {
+//                //Finished trasmitting
+//				flag_tx_busy = SU_FALSE;
+//			}
+//		}
+//
+//	}
+//
+//	// Receiver Section
+//	if ( flag_rx_off == SU_FALSE ) {
+//		//if ( flag_rx_waiting_for_stop_bit ) {
+//		//	if ( --timer_rx_ctr == 0 ) {
+//		//		flag_rx_waiting_for_stop_bit = SU_FALSE;
+//		//		flag_rx_ready = SU_FALSE;
+//				//put in into the buffer
+//				//inbuf[qin] = internal_rx_buffer;
+//				//if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
+//					// overflow - reset inbuf-index
+//				//	qin = 0;
+//				//}
+//		//		rx_state = STOP_BIT;
+//		//	}
+//		//}
+//		//else {  // rx_test_busy
+//		//	if ( flag_rx_ready == SU_FALSE ) {
+//				//start_bit = get_rx_pin_status();
+//		//		pin_data= get_rx_pin_status();
+//				// test for start bit
+//				//If the start bit is low then begin reading data
+//		//		if ( (start_bit&0x01) == 0 ) {
+//                    //Set rx_ready to indicate that the receiver is now in operation
+//		//			flag_rx_ready      = SU_TRUE;
+//					//Initialize buffer and rx counter
+//		//			internal_rx_buffer = 0;
+//		//			timer_rx_ctr       = 3;
+//		//			bits_left_in_rx    = RX_NUM_OF_BITS;
+//		//			rx_mask            = 1;
+//		//		}
+//		//	}
+//		//	else {  // rx_busy
+//				//tmp = timer_rx_ctr;
+//		//		 if ( --timer_rx_ctr == 0 ) {
+//					// rcv
+//					//tmp = 3;
+//					//flag_in = get_rx_pin_status();
+//		//			pin_data = get_rx_pin_status();
+//					//if ( flag_in ) {
+//                        //if it is a on then or it with RXMASK
+//					//	internal_rx_buffer |= rx_mask;
+//					//}
+//					//rx_mask <<= 1;
+//					//if ( --bits_left_in_rx == 0 ) {
+//                        //wait for stop bit
+//						//flag_rx_waiting_for_stop_bit = SU_TRUE;
+//					//}
+//		//			timer_rx_ctr = 3;
+//		//		}
+//				//timer_rx_ctr = tmp;
+//				//timer_rx_ctr=2;
+//		//	}
+//
+//		if(timer_rx_ctr == 0)
+//		{
+//		//pin_state= get_rx_pin_status();
+//		pin_data = get_rx_pin_status();
+//		timer_rx_ctr = 2;
+//		}
+//		else
+//		{
+//		timer_rx_ctr = timer_rx_ctr - 1;
+//		}
+//
+//
+//
+//		}
+
+
+
+
+if ( flag_tx_busy == SU_TRUE ) {
 
         //There is data to transmit. The data is located in the buffer
         //The timer runs 3 times faster. Decrement it each time
@@ -286,7 +385,6 @@ void timer1_isr() __interrupt TF1_ISR
 			    //Send out the data bit
 			    //Maybe use some assembly here later
 				set_tx_pin_high();
-				//toggle_pins();
 			}
 			else {
                 //Send data bit out
@@ -305,71 +403,60 @@ void timer1_isr() __interrupt TF1_ISR
 
 	// Receiver Section
 	if ( flag_rx_off == SU_FALSE ) {
-		//if ( flag_rx_waiting_for_stop_bit ) {
-		//	if ( --timer_rx_ctr == 0 ) {
-		//		flag_rx_waiting_for_stop_bit = SU_FALSE;
-		//		flag_rx_ready = SU_FALSE;
-				//put in into the buffer
-				//inbuf[qin] = internal_rx_buffer;
-				//if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
-					// overflow - reset inbuf-index
-				//	qin = 0;
-				//}
-		//		rx_state = STOP_BIT;
-		//	}
-		//}
-		//else {  // rx_test_busy
-		//	if ( flag_rx_ready == SU_FALSE ) {
-				//start_bit = get_rx_pin_status();
-		//		pin_data= get_rx_pin_status();
-				// test for start bit
-				//If the start bit is low then begin reading data
-		//		if ( (start_bit&0x01) == 0 ) {
-                    //Set rx_ready to indicate that the receiver is now in operation
-		//			flag_rx_ready      = SU_TRUE;
-					//Initialize buffer and rx counter
-		//			internal_rx_buffer = 0;
-		//			timer_rx_ctr       = 3;
-		//			bits_left_in_rx    = RX_NUM_OF_BITS;
-		//			rx_mask            = 1;
-		//		}
-		//	}
-		//	else {  // rx_busy
-				//tmp = timer_rx_ctr;
-		//		 if ( --timer_rx_ctr == 0 ) {
-					// rcv
-					//tmp = 3;
-					//flag_in = get_rx_pin_status();
-		//			pin_data = get_rx_pin_status();
-					//if ( flag_in ) {
-                        //if it is a on then or it with RXMASK
-					//	internal_rx_buffer |= rx_mask;
-					//}
-					//rx_mask <<= 1;
-					//if ( --bits_left_in_rx == 0 ) {
-                        //wait for stop bit
-						//flag_rx_waiting_for_stop_bit = SU_TRUE;
-					//}
-		//			timer_rx_ctr = 3;
-		//		}
-				//timer_rx_ctr = tmp;
-				//timer_rx_ctr=2;
-		//	}
-
-		if(timer_rx_ctr == 0)
-		{
-		//pin_state= get_rx_pin_status();
-		pin_data = get_rx_pin_status();
-		timer_rx_ctr = 2;
-		}
-		else
-		{
-		timer_rx_ctr = timer_rx_ctr - 1;
-		}
+//		if ( flag_rx_waiting_for_stop_bit ) {
+//			if ( --timer_rx_ctr == 0 ) {
+//				flag_rx_waiting_for_stop_bit = SU_FALSE;
+//				flag_rx_ready = SU_FALSE;
+//				//put in into the buffer
+//				inbuf[qin] = internal_rx_buffer;
+//				if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
+//					// overflow - reset inbuf-index
+//					qin = 0;
+//				}
+//			}
+//		}
+//		else {  // rx_test_busy
+//			if ( flag_rx_ready == SU_FALSE ) {
+//				start_bit = get_rx_pin_status();
+//				// test for start bit
+//				//If the start bit is low then begin reading data
+//				if ( start_bit == 0 ) {
+//                    //Set rx_ready to indicate that the receiver is now in operation
+//					flag_rx_ready      = SU_TRUE;
+//					//Initialize buffer and rx counter
+//					internal_rx_buffer = 0;
+//					timer_rx_ctr       = 4;
+//					bits_left_in_rx    = RX_NUM_OF_BITS;
+//					rx_mask            = 1;
+//				}
+//			}
+//			else {  // rx_busy
+//				//tmp = timer_rx_ctr;
+//				 if ( --timer_rx_ctr == 0 ) {
+//					// rcv
+//					//tmp = 3;
+//					flag_in = get_rx_pin_status();
+//					if ( flag_in ) {
+//                        //if it is a on then or it with RXMASK
+//						internal_rx_buffer |= rx_mask;
+//					}
+//					rx_mask <<= 1;
+//					if ( --bits_left_in_rx == 0 ) {
+//                        //wait for stop bit
+//						flag_rx_waiting_for_stop_bit = SU_TRUE;
+//					}
+//				}
+//				//timer_rx_ctr = tmp;
+//			}
+//		}
+	}
 
 
 
-		}
+
+
+
+
 	}
 
 
