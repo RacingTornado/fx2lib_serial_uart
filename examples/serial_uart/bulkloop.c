@@ -122,6 +122,8 @@ void main() {
         //Handles device descriptor requests
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
+
+
         if(qout!= qin)
         {
         softuart_putchar(inbuf[qout]);
@@ -265,7 +267,7 @@ void timer1_isr() __interrupt TF1_ISR
 //toggle_pins();
 
 //toggle_port_value(0xb0,1);
-
+//get_rx_pin_status();
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {
 
@@ -298,7 +300,6 @@ void timer1_isr() __interrupt TF1_ISR
 	if ( flag_rx_off == SU_FALSE ) {
 		if ( flag_rx_waiting_for_stop_bit ) {
 			if ( --timer_rx_ctr == 0 ) {
-			toggle_port_value(0xb0,1);
 				flag_rx_waiting_for_stop_bit = SU_FALSE;
 				flag_rx_ready = SU_FALSE;
 				//put in into the buffer
@@ -316,6 +317,7 @@ void timer1_isr() __interrupt TF1_ISR
 				//If the start bit is low then begin reading data
 				if ( start_bit == 0 ) {
                     //Set rx_ready to indicate that the receiver is now in operation
+                    toggle_port_value(0xb0,1);
 					flag_rx_ready      = SU_TRUE;
 					//Initialize buffer and rx counter
 					internal_rx_buffer = 0;

@@ -426,7 +426,24 @@ void softuart_puts_p( const char *prg_s )
 
 unsigned char get_rx_pin_status()
 {
-  return SOFTUART_RXBIT;
+    __asm
+    nop
+    nop
+    nop
+    nop
+   	mov	a,0x80
+   	nop
+    nop
+    nop
+    nop
+   	rrc a
+   	rrc a
+   	jc somewhere
+   	cpl 0xb0
+	somewhere:mov	dpl,a
+	ret
+	__endasm;
+  //return SOFTUART_RXBIT;
 }
 
 
@@ -434,7 +451,8 @@ void set_tx_pin_high()
 {
 //SOFTUART_TXBIT = 1;
 //PA0 = 1;
-IOA = 0x01;
+//IOA = 0x01;
+PA0 = 1;
 SYNCDELAY;
 }
 
@@ -442,10 +460,10 @@ SYNCDELAY;
 void set_tx_pin_low()
 {
 //SOFTUART_TXBIT=0;
-IOA=0x00;
+//IOA=0x00;
 __asm
 mov 0xb2, #0x01
-mov 0x80, #0x00
+clr 0x80
 __endasm;
 SYNCDELAY;
 }

@@ -165,6 +165,10 @@ static void Initialize(void)
 	// Enable SUDAV (setup data available) interrupt
 	//See 15.7.7 for more details
 	USBIE = 0x01;
+	PORTACFG= 0x00;
+	__asm
+	mov 0xb2,#0x01
+	__endasm;
 }
 
 
