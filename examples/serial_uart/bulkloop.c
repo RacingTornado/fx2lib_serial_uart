@@ -58,6 +58,8 @@ __bit on;
 	unsigned char start_bit, flag_in;
 	unsigned char pin_data;
 	unsigned char buf_data;
+	unsigned char bit_number;
+	unsigned char pin_state;
 
 
 	typedef enum
@@ -116,6 +118,7 @@ void main() {
     softuart_init();
     start_timer();
     ENABLE_TIMER1();
+    rx_state = START_BIT;
 
     configure_drive(0xb0,0);
 
@@ -138,7 +141,23 @@ void main() {
         //Handles device descriptor requests
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
-        uart_rx_fill();
+        //uart_rx_fill();
+
+        if(qin != qout)
+        {
+        softuart_putchar(inbuf[qout]);
+        softuart_putchar(0x3d);
+        qout++;
+        if(qout == SOFTUART_IN_BUF_SIZE)
+        {
+            qout =0;
+
+        }
+
+
+
+        }
+
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -359,7 +378,35 @@ void timer1_isr() __interrupt TF1_ISR
 		if(timer_rx_ctr == 0)
 		{
 		//pin_state= get_rx_pin_status();
-		pin_data = get_rx_pin_status();
+		//pin_data = get_rx_pin_status();
+		pin_state= get_rx_pin_status();
+		if(pin_state == 0 && rx_state ==  START_BIT)
+		{
+           rx_state= DATA;
+		}
+		else if(rx_state == DATA)
+		{
+            pin_data |= (pin_state << bit_number);
+            bit_number = bit_number + 1;
+            if(bit_number == 7)
+            {
+            rx_state = STOP_BIT;
+            }
+
+		}
+		else
+		{
+            if(pin_state == 1 && rx_state == STOP_BIT)
+            {
+            rx_state = START_BIT;
+            inbuf[qin] = pin_data;
+            qin++;
+            if(qin== SOFTUART_IN_BUF_SIZE)
+            {
+            qin =0 ;
+            }
+            }
+		}
 		timer_rx_ctr = 2;
 		}
 		else
@@ -378,13 +425,13 @@ void timer1_isr() __interrupt TF1_ISR
 void uart_rx_fill()
 {
 
-static bit_number ;
     switch(rx_state)
     {
         case START_BIT:
             if(pin_data == 0)
             {
             rx_state =DATA;
+            toggle_port_value(0xb0,1);
             }
             bit_number = 0 ;
             break;
