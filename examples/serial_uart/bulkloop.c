@@ -121,7 +121,16 @@ void main() {
         //toggle_pins();
         //Handles device descriptor requests
         //softuart_putchar(0x3c);
-        softuart_putchar(softuart_getchar());
+        //softuart_putchar(softuart_getchar());
+        if(qout!= qin)
+        {
+        softuart_putchar(inbuf[qout]);
+        qout++;
+        if(qout > SOFTUART_IN_BUF_SIZE)
+        {
+        qout =0;
+        }
+        }
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -255,7 +264,7 @@ void timer1_isr() __interrupt TF1_ISR
 {
 //toggle_pins();
 
-toggle_port_value(0xb0,1);
+//toggle_port_value(0xb0,1);
 
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {
@@ -289,6 +298,7 @@ toggle_port_value(0xb0,1);
 	if ( flag_rx_off == SU_FALSE ) {
 		if ( flag_rx_waiting_for_stop_bit ) {
 			if ( --timer_rx_ctr == 0 ) {
+			toggle_port_value(0xb0,1);
 				flag_rx_waiting_for_stop_bit = SU_FALSE;
 				flag_rx_ready = SU_FALSE;
 				//put in into the buffer
