@@ -388,9 +388,10 @@ void timer1_isr() __interrupt TF1_ISR
 		{
             pin_data |= (pin_state << bit_number);
             bit_number = bit_number + 1;
-            if(bit_number == 7)
+            if(bit_number == 8)
             {
             rx_state = STOP_BIT;
+            bit_number =0 ;
             }
 
 		}
@@ -405,6 +406,7 @@ void timer1_isr() __interrupt TF1_ISR
             {
             qin =0 ;
             }
+            pin_data = 0;
             }
 		}
 		timer_rx_ctr = 2;
