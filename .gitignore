@@ -18,3 +18,4 @@ build
 *_str.c
 *~
 *.hex
+*.lk
