@@ -429,9 +429,12 @@ unsigned char get_rx_pin_status()
     unsigned char temp;
 
     SYNCDELAY;
+    SYNCDELAY;
     temp = IOA;
     SYNCDELAY;
+    SYNCDELAY;
     temp = temp >> 1;
+    temp = temp & 0x01;
     return temp;
 
 

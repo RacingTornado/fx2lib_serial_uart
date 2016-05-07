@@ -320,7 +320,7 @@ void timer1_isr() __interrupt TF1_ISR
 					flag_rx_ready      = SU_TRUE;
 					//Initialize buffer and rx counter
 					internal_rx_buffer = 0;
-					timer_rx_ctr       = 4;
+					timer_rx_ctr       = 1;
 					bits_left_in_rx    = RX_NUM_OF_BITS;
 					rx_mask            = 1;
 				}
