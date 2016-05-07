@@ -91,11 +91,15 @@ void main() {
     RENUMERATE_UNCOND();
     //Call our custom function to do our UART init
     uart_config();
+
     //configure_timer();
     //timer_init();
+
     softuart_init();
     start_timer();
     ENABLE_TIMER1();
+
+
     //d();
 
     //SETCPUFREQ(CLK_48M);
@@ -122,7 +126,7 @@ void main() {
         if(!(EP1OUTCS & bmEPBUSY))
         {
            ProcessRecvData();
-           toggle_pins();
+           //toggle_pins();
 
         }
 
