@@ -56,6 +56,17 @@ __bit on;
 	static unsigned char internal_rx_buffer;
 
 	unsigned char start_bit, flag_in;
+	unsigned char pin_data;
+	unsigned char buf_data;
+
+
+	typedef enum
+{
+START_BIT=2,
+DATA,
+STOP_BIT
+
+} uart_state_rx;
 
 extern void uart_config();
 extern void ProcessXmitData();
@@ -69,6 +80,7 @@ extern void set_tx_pin_low();
 extern unsigned char get_rx_pin_status();
 extern void configure_drive(unsigned char a, unsigned char b);
 extern void toggle_port_value(unsigned char a, unsigned char b);
+extern void uart_rx_fill();
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
 extern volatile unsigned short internal_tx_buffer;
@@ -79,6 +91,10 @@ extern volatile  unsigned char  flag_rx_ready;
 extern unsigned char qout;
 extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
 extern volatile unsigned char qin;
+
+
+
+uart_state_rx rx_state;
 
 void main() {
 
@@ -122,17 +138,7 @@ void main() {
         //Handles device descriptor requests
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
-
-
-        if(qout!= qin)
-        {
-        softuart_putchar(inbuf[qout]);
-        qout++;
-        if(qout > SOFTUART_IN_BUF_SIZE)
-        {
-        qout =0;
-        }
-        }
+        //uart_rx_fill();
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -299,58 +305,106 @@ toggle_port_value(0xb0,1);
 
 	// Receiver Section
 	if ( flag_rx_off == SU_FALSE ) {
-		if ( flag_rx_waiting_for_stop_bit ) {
-			if ( --timer_rx_ctr == 0 ) {
-				flag_rx_waiting_for_stop_bit = SU_FALSE;
-				flag_rx_ready = SU_FALSE;
+		//if ( flag_rx_waiting_for_stop_bit ) {
+		//	if ( --timer_rx_ctr == 0 ) {
+		//		flag_rx_waiting_for_stop_bit = SU_FALSE;
+		//		flag_rx_ready = SU_FALSE;
 				//put in into the buffer
-				inbuf[qin] = internal_rx_buffer;
-				if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
+				//inbuf[qin] = internal_rx_buffer;
+				//if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
 					// overflow - reset inbuf-index
-					qin = 0;
-				}
-			}
-		}
-		else {  // rx_test_busy
-			if ( flag_rx_ready == SU_FALSE ) {
-				start_bit = get_rx_pin_status();
+				//	qin = 0;
+				//}
+		//		rx_state = STOP_BIT;
+		//	}
+		//}
+		//else {  // rx_test_busy
+		//	if ( flag_rx_ready == SU_FALSE ) {
+				//start_bit = get_rx_pin_status();
+		//		pin_data= get_rx_pin_status();
 				// test for start bit
 				//If the start bit is low then begin reading data
-				if ( (start_bit&0x01) == 0 ) {
+		//		if ( (start_bit&0x01) == 0 ) {
                     //Set rx_ready to indicate that the receiver is now in operation
-					flag_rx_ready      = SU_TRUE;
+		//			flag_rx_ready      = SU_TRUE;
 					//Initialize buffer and rx counter
-					internal_rx_buffer = 0;
-					timer_rx_ctr       = 3;
-					bits_left_in_rx    = RX_NUM_OF_BITS;
-					rx_mask            = 1;
-				}
-			}
-			else {  // rx_busy
+		//			internal_rx_buffer = 0;
+		//			timer_rx_ctr       = 3;
+		//			bits_left_in_rx    = RX_NUM_OF_BITS;
+		//			rx_mask            = 1;
+		//		}
+		//	}
+		//	else {  // rx_busy
 				//tmp = timer_rx_ctr;
-				 if ( --timer_rx_ctr == 0 ) {
+		//		 if ( --timer_rx_ctr == 0 ) {
 					// rcv
 					//tmp = 3;
-					flag_in = get_rx_pin_status();
-					if ( flag_in ) {
+					//flag_in = get_rx_pin_status();
+		//			pin_data = get_rx_pin_status();
+					//if ( flag_in ) {
                         //if it is a on then or it with RXMASK
-						internal_rx_buffer |= rx_mask;
-					}
-					rx_mask <<= 1;
-					if ( --bits_left_in_rx == 0 ) {
+					//	internal_rx_buffer |= rx_mask;
+					//}
+					//rx_mask <<= 1;
+					//if ( --bits_left_in_rx == 0 ) {
                         //wait for stop bit
-						flag_rx_waiting_for_stop_bit = SU_TRUE;
-					}
-					timer_rx_ctr = 3;
-				}
+						//flag_rx_waiting_for_stop_bit = SU_TRUE;
+					//}
+		//			timer_rx_ctr = 3;
+		//		}
 				//timer_rx_ctr = tmp;
 				//timer_rx_ctr=2;
-			}
+		//	}
+
+		if(timer_rx_ctr == 0)
+		{
+		//pin_state= get_rx_pin_status();
+		pin_data = get_rx_pin_status();
+		timer_rx_ctr = 2;
+		}
+		else
+		{
+		timer_rx_ctr = timer_rx_ctr - 1;
+		}
+
+
+
 		}
 	}
 
 
 
+
+void uart_rx_fill()
+{
+
+static bit_number ;
+    switch(rx_state)
+    {
+        case START_BIT:
+            if(pin_data == 0)
+            {
+            rx_state =DATA;
+            }
+            bit_number = 0 ;
+            break;
+        case DATA:
+            pin_data |= (pin_data << bit_number);
+            bit_number = bit_number + 1;
+            if(bit_number == 8)
+            {
+            rx_state = STOP_BIT;
+            }
+            break;
+        case STOP_BIT:
+            if(pin_data == 1)
+            {
+            buf_data = pin_data;
+            softuart_putchar(buf_data);
+            rx_state = START_BIT;
+            }
+            break;
+    }
 
 
 }
