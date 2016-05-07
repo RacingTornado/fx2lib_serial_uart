@@ -315,9 +315,8 @@ void timer1_isr() __interrupt TF1_ISR
 				start_bit = get_rx_pin_status();
 				// test for start bit
 				//If the start bit is low then begin reading data
-				if ( start_bit == 0 ) {
+				if ( (start_bit&0x01) == 0 ) {
                     //Set rx_ready to indicate that the receiver is now in operation
-                    toggle_port_value(0xb0,1);
 					flag_rx_ready      = SU_TRUE;
 					//Initialize buffer and rx counter
 					internal_rx_buffer = 0;

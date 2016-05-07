@@ -426,23 +426,15 @@ void softuart_puts_p( const char *prg_s )
 
 unsigned char get_rx_pin_status()
 {
-    __asm
-    nop
-    nop
-    nop
-    nop
-   	mov	a,0x80
-   	nop
-    nop
-    nop
-    nop
-   	rrc a
-   	rrc a
-   	jc somewhere
-   	cpl 0xb0
-	somewhere:mov	dpl,a
-	ret
-	__endasm;
+    unsigned char temp;
+
+    SYNCDELAY;
+    temp = IOA;
+    SYNCDELAY;
+    temp = temp >> 1;
+    return temp;
+
+
   //return SOFTUART_RXBIT;
 }
 
