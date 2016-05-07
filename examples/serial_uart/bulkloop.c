@@ -138,7 +138,7 @@ void main() {
         //Handles device descriptor requests
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
-        //uart_rx_fill();
+        uart_rx_fill();
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -274,7 +274,7 @@ void timer1_isr() __interrupt TF1_ISR
 
 //toggle_port_value(0xb0,1);
 //get_rx_pin_status();
-toggle_port_value(0xb0,1);
+//toggle_port_value(0xb0,1);
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {
 
