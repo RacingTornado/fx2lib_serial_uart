@@ -268,6 +268,7 @@ void timer1_isr() __interrupt TF1_ISR
 
 //toggle_port_value(0xb0,1);
 //get_rx_pin_status();
+toggle_port_value(0xb0,1);
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {
 
@@ -320,7 +321,7 @@ void timer1_isr() __interrupt TF1_ISR
 					flag_rx_ready      = SU_TRUE;
 					//Initialize buffer and rx counter
 					internal_rx_buffer = 0;
-					timer_rx_ctr       = 1;
+					timer_rx_ctr       = 3;
 					bits_left_in_rx    = RX_NUM_OF_BITS;
 					rx_mask            = 1;
 				}
@@ -340,8 +341,10 @@ void timer1_isr() __interrupt TF1_ISR
                         //wait for stop bit
 						flag_rx_waiting_for_stop_bit = SU_TRUE;
 					}
+					timer_rx_ctr = 3;
 				}
 				//timer_rx_ctr = tmp;
+				//timer_rx_ctr=2;
 			}
 		}
 	}
