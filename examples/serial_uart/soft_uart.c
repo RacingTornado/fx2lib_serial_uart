@@ -338,6 +338,7 @@ void softuart_init( void )
 
 	io_init();
 	timer_init();
+	softuart_turn_rx_on();
 }
 
 static void idle(void)
@@ -362,7 +363,8 @@ char softuart_getchar( void )
 	char ch;
     //Read back the data
 	while ( qout == qin ) {
-		idle();
+		//idle();
+		return 0x30;
 	}
 	ch = inbuf[qout];
 	if ( ++qout >= SOFTUART_IN_BUF_SIZE ) {

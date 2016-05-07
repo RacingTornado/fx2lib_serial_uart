@@ -67,6 +67,8 @@ extern void timer_init();
 extern void set_tx_pin_high();
 extern void set_tx_pin_low();
 extern unsigned char get_rx_pin_status();
+extern void configure_drive(unsigned char a, unsigned char b);
+extern void toggle_port_value(unsigned char a, unsigned char b);
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
 extern volatile unsigned short internal_tx_buffer;
@@ -99,6 +101,8 @@ void main() {
     start_timer();
     ENABLE_TIMER1();
 
+    configure_drive(0xb0,0);
+
 
     //d();
 
@@ -116,7 +120,8 @@ void main() {
     while(TRUE) {
         //toggle_pins();
         //Handles device descriptor requests
-        softuart_putchar(0x3c);
+        //softuart_putchar(0x3c);
+        softuart_putchar(softuart_getchar());
         if ( got_sud ) {
         handle_setupdata();
         got_sud=FALSE;
@@ -250,7 +255,7 @@ void timer1_isr() __interrupt TF1_ISR
 {
 //toggle_pins();
 
-
+toggle_port_value(0xb0,1);
 
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {

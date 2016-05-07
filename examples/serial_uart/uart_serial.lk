@@ -21,5 +21,6 @@ uart_config.rel
 descriptors.rel
 timer_conf.rel
 soft_uart.rel
+toggle.rel
 
 -e
