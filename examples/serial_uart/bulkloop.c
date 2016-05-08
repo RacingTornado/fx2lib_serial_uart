@@ -83,6 +83,7 @@ extern unsigned char get_rx_pin_status();
 extern void configure_drive(unsigned char a, unsigned char b);
 extern void toggle_port_value(unsigned char a, unsigned char b);
 extern void uart_rx_fill();
+extern void putchar_a(char a);
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
 extern volatile unsigned short internal_tx_buffer;
@@ -147,6 +148,7 @@ void main() {
         {
         softuart_putchar(inbuf[qout]);
         softuart_putchar(0x3d);
+        putchar_a(inbuf[qout]);
         qout++;
         if(qout == SOFTUART_IN_BUF_SIZE)
         {
