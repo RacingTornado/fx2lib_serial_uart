@@ -147,10 +147,11 @@ void main() {
         //softuart_putchar(0x3c);
         //softuart_putchar(softuart_getchar());
         //uart_rx_fill();
-        i2c_bitbang();
+        //i2c_bitbang();
         //temp_call();
         if(qin != qout)
         {
+        i2c_bitbang();
         softuart_putchar(inbuf[qout]);
         softuart_putchar(0x3d);
         putchar_a(inbuf[qout]);
