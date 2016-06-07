@@ -17,14 +17,17 @@ extern void toggle_pins();
 BOOL handle_mpsse()
 {
 
+toggle_pins();
         switch (SETUPDAT[0])
         {
 
         case MPSSE_BITBANG:
             {
                 toggle_pins();
+                toggle_pins();
+                toggle_pins();
                 EP0BUF[0]=01;
-                EP0BUF[1]=02;
+                EP0BUF[1]= 06;
                 EP0BCH=0;
                 EP0BCL=2;
             }

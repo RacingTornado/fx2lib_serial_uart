@@ -334,7 +334,6 @@ BOOL handle_set_configuration(BYTE cfg) {
 // copied usb jt routines from usbjt.h
 void sudav_isr() __interrupt SUDAV_ISR {
 
-toggle_pins();
 
   got_sud=TRUE;
   CLEAR_SUDAV();

@@ -70,8 +70,8 @@ void _handle_get_descriptor();
 */
 
 void handle_setupdata() {
-    printf("Handle setupdat: 0x%02x\n", SETUPDAT[1]);
-    toggle_pins();
+    //printf("Handle setupdat: 0x%02x\n", SETUPDAT[1]);
+
 
     switch ( SETUPDAT[1] ) {
         case GET_STATUS:
@@ -157,7 +157,6 @@ volatile BOOL self_powered=FALSE;
 volatile BOOL remote_wakeup_allowed=FALSE;
 
 BOOL handle_get_status() {
-
     switch ( SETUPDAT[0] ) {
 //        case 0: // sometimes we get a 0 status too
 
@@ -189,8 +188,12 @@ BOOL handle_get_status() {
             }
             break;
         default:
+        {
             printf("Unexpected Get Status: 0x%02x\n", SETUPDAT[0]);
+            handle_vendorcommand(SETUPDAT[1]);
             return FALSE;
+
+        }
     }
     return TRUE;
 }
@@ -201,7 +204,6 @@ BOOL handle_get_status() {
 
 BOOL handle_clear_feature() {
     printf("Clear Feature 0x%02x\n", SETUPDAT[0]);
-
     switch ( SETUPDAT[0] ) {
         case GF_DEVICE:
             if (SETUPDAT[2] == 1) {
@@ -225,7 +227,9 @@ BOOL handle_clear_feature() {
             }
             break;
         default:
+            {
             return handle_vendorcommand(SETUPDAT[1]);
+            }
     }
     return TRUE;
 }
@@ -382,4 +386,22 @@ void _handle_get_descriptor() {
             printf("Unknown: %02x\n", SETUPDAT[3]);
             STALLEP0();
     }
+}
+
+void toggle_pins_core_1()
+{
+  OEA=0x01;
+  NOP;
+  NOP;
+  NOP;
+  NOP;
+  __asm
+  CPL 0x80;
+  __endasm;
+  NOP;
+  NOP;
+  NOP;
+  NOP;
+
+
 }
