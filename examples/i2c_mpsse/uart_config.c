@@ -30,6 +30,8 @@ unsigned int latency_us=40000;
 //smaller. In this case, the endpoint needs to be configured by setting the EPIOUTCFG, and EP1INCFG
 //registers . For endpoint configuration, refer Table 8.2
 
+extern void softuart_putchar(char a);
+
  void ProcessXmitData(void)
 {
 	// reset Timer 0
@@ -348,9 +350,13 @@ void uart_config()
 	for(i=0; i<len; i++,src++)
 	   {
 	      if(*src>='a' && *src<='z')
-		 {  putchar_a(*src-'a'+'A');  }
+		 {  putchar_a(*src-'a'+'A');
+		    softuart_putchar(*src);
+		  }
 	      else
-		 {  putchar_a(*src);  }
+		 {  putchar_a(*src);
+		    softuart_putchar(*src);
+		  }
 	   }
 
 	EP1OUTBC=0xff; // re-arm endpoint 1 for OUT (host->device) transfers

@@ -56,6 +56,8 @@ setb _PA5;
 djnz r1, 0001$
 orl _IE,#0x80
 
+
+
 ;setb _PA3; this is for stop bit and has to be tackled later
 clr _PA5;
 
@@ -191,3 +193,5 @@ return b;
 
 
 }
+
+

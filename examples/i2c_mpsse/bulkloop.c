@@ -27,6 +27,7 @@
 #include <eputils.h>
 #include <fx2ints.h>
 #include "softuart.h"
+#include "mpsse.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -95,6 +96,8 @@ extern void spi_miso_data_logic();
 
 extern void temp_call();
 extern char xxy(char a,char b);
+extern BOOL handle_mpsse();
+
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
 extern volatile unsigned short internal_tx_buffer;
@@ -152,6 +155,8 @@ void main() {
     ENABLE_HISPEED();
     ENABLE_USBRESET();
     EA=1; // global interrupt enable
+
+    USBCS |= bmRENUM;
     while(TRUE) {
         //toggle_pins();
         //Handles device descriptor requests
@@ -162,32 +167,32 @@ void main() {
         //temp_call();
         if(qin != qout)
         {
-//        i2c_addr_logic();
-//        bxxy = i2c_data_logic(0x60);
-//        i2c_stop_logic();
-//        softuart_putchar(inbuf[qout]);
-//        softuart_putchar(0x3d);
-//        softuart_putchar(bxxy);
-//        putchar_a(inbuf[qout]);
-//        putchar_a(0x25);
+        i2c_addr_logic();
+        bxxy = i2c_data_logic(0x60);
+        i2c_stop_logic();
+        softuart_putchar(inbuf[qout]);
+        softuart_putchar(0x3d);
+        softuart_putchar(bxxy);
+        putchar_a(inbuf[qout]);
+        putchar_a(0x25);
 
 
         //spi_data_logic(0x23,0x60);
         //spi_data_logic(0x56,0x28);
-        PA2 = 0;
-        OEA = 0x04;
-        SYNCDELAY;
-        PA2 = 1;
-        SYNCDELAY;
-        spi_mosi_data_logic();
-        spi_miso_data_logic();
-        spi_data_logic(0x23,0x64);
-        spi_data_logic(0x56,0x2C);
-        spi_data_logic(0x23,0x64);
-        spi_mosi_data_logic();
-        spi_miso_data_logic();
-        PA2 = 0;
-        SYNCDELAY;
+        //PA2 = 0;
+        //OEA = 0x04;
+        //SYNCDELAY;
+        //PA2 = 1;
+        //SYNCDELAY;
+        //spi_mosi_data_logic();
+        //spi_miso_data_logic();
+        //spi_data_logic(0x23,0x64);
+        //spi_data_logic(0x56,0x2C);
+        //spi_data_logic(0x23,0x64);
+        //spi_mosi_data_logic();
+        //spi_miso_data_logic();
+        //PA2 = 0;
+        //SYNCDELAY;
         softuart_putchar(inbuf[qout]);
         softuart_putchar(0x3d);
         putchar_a(inbuf[qout]);
@@ -255,6 +260,15 @@ BOOL handle_vendorcommand(BYTE cmd) {
           return TRUE;
          }
         }
+        break;
+    case VENDOR_COMMAND:
+        {
+        if(!handle_mpsse())
+            return FALSE;
+        else
+            return TRUE;
+        }
+        break;
      default:
           printf ( "Need to implement vendor command: %02x\n", cmd );
  }
@@ -319,6 +333,8 @@ BOOL handle_set_configuration(BYTE cfg) {
 
 // copied usb jt routines from usbjt.h
 void sudav_isr() __interrupt SUDAV_ISR {
+
+toggle_pins();
 
   got_sud=TRUE;
   CLEAR_SUDAV();
