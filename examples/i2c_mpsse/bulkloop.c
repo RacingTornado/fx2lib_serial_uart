@@ -156,7 +156,7 @@ void main() {
     ENABLE_USBRESET();
     EA=1; // global interrupt enable
 
-    USBCS |= bmRENUM;
+    //USBCS |= bmRENUM;
     while(TRUE) {
         //toggle_pins();
         //Handles device descriptor requests
