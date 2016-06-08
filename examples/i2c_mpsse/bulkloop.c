@@ -169,6 +169,8 @@ main ()
       //uart_rx_fill();
       //i2c_bitbang();
       //temp_call();
+
+    //toggle_pins();
       if (qin != qout)
 	{
 	  i2c_addr_logic ();
@@ -216,13 +218,18 @@ main ()
 	}
 
       //if ( got_sud ) {
-      if (anotherone == 1)
+      if (anotherone >0 )
 	{
 	  toggle_pins ();
 	  toggle_pins ();
+      toggle_pins();
+	  toggle_pins();
 	  handle_setupdata ();
-	  got_sud = FALSE;
-	  anotherone = 0;
+	  anotherone --;
+	}
+	else
+	{
+        //toggle_pins();
 	}
 
 
@@ -381,11 +388,11 @@ sudav_isr ()
 
        toggle_pins ();
        toggle_pins ();
-       toggle_pins ();
-       toggle_pins ();
+       //toggle_pins ();
+       //toggle_pins ();
 
        got_sud = TRUE;
-       anotherone = 1;
+       anotherone++;
        CLEAR_SUDAV ();
      }
 

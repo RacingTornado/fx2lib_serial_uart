@@ -25,8 +25,8 @@ BOOL handle_mpsse()
             {
 
                 //EP0CS |= 0x80;
-                toggle_pins();
-                toggle_pins();
+                //toggle_pins();
+                //toggle_pins();
                 EP0BUF[0]=01;
                 EP0BUF[1]= 06;
                 EP0BCH=0;

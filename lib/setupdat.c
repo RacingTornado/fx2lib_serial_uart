@@ -133,8 +133,6 @@ void handle_setupdata() {
             }
             break;
         default:
-            toggle_pins_core_1();
-            toggle_pins_core_1();
             if (!handle_vendorcommand(SETUPDAT[1])) {
                 printf("Unhandled Vendor Command: 0x%02x\n" , SETUPDAT[1]);
                 STALLEP0();
@@ -206,7 +204,6 @@ BOOL handle_get_status() {
             break;
         default:
         {
-            toggle_pins_core_1();
             printf("Unexpected Get Status: 0x%02x\n", SETUPDAT[0]);
             handle_vendorcommand(SETUPDAT[1]);
             return FALSE;
