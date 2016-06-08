@@ -74,7 +74,7 @@ BOOL handle_mpsse()
 
         case MPSSE_FIVE:
         {
-            EP0BUF[0] = 1;
+            EP0BUF[0] = 0;
             EP0BUF[1] = 0;
             EP0BCH = 0;
             EP0BCL = 1;
