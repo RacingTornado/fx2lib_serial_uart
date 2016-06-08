@@ -64,10 +64,23 @@ BOOL handle_mpsse()
         {
             EP0BUF[0]= 0;
             EP0BUF[1] = 1;
-            EP0BCH - 0;
+            EP0BCH = 0;
             EP0BCL = 2;
             SUDPTRL = 3;
             EP0CS |= 0x80;
+
+        }
+        break;
+
+        case MPSSE_FIVE:
+        {
+            EP0BUF[0] = 1;
+            EP0BUF[1] = 0;
+            EP0BCH = 0;
+            EP0BCL = 1;
+            SUDPTRL = 3;
+            EP0CS |= 0x80;
+
 
         }
         break;

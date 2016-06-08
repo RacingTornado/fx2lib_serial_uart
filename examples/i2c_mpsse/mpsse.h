@@ -6,5 +6,6 @@
 #define MPSSE_TWO 0x03
 #define MPSSE_THREE 0x09
 #define MPSSE_FOUR 0x0b
+#define MPSSE_FIVE 0x0c
 
 #endif
