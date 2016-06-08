@@ -72,6 +72,16 @@ void _handle_get_descriptor();
 void handle_setupdata() {
     //printf("Handle setupdat: 0x%02x\n", SETUPDAT[1]);
 
+ if(SETUPDAT[0]==0x40)
+ {
+toggle_pins_core_1();
+toggle_pins_core_1();
+ handle_vendorcommand(SETUPDAT[1]);
+
+ }
+
+ else
+ {
 
     switch ( SETUPDAT[1] ) {
         case GET_STATUS:
@@ -122,6 +132,8 @@ void handle_setupdata() {
             }
             break;
         default:
+            toggle_pins_core_1();
+            toggle_pins_core_1();
             if (!handle_vendorcommand(SETUPDAT[1])) {
                 printf("Unhandled Vendor Command: 0x%02x\n" , SETUPDAT[1]);
                 STALLEP0();
@@ -130,6 +142,8 @@ void handle_setupdata() {
 
     // do the handshake
     EP0CS |= bmHSNAK;
+
+    }
 }
 
 __xdata BYTE* ep_addr(BYTE ep) {
@@ -157,6 +171,8 @@ volatile BOOL self_powered=FALSE;
 volatile BOOL remote_wakeup_allowed=FALSE;
 
 BOOL handle_get_status() {
+
+
     switch ( SETUPDAT[0] ) {
 //        case 0: // sometimes we get a 0 status too
 
@@ -189,6 +205,7 @@ BOOL handle_get_status() {
             break;
         default:
         {
+            toggle_pins_core_1();
             printf("Unexpected Get Status: 0x%02x\n", SETUPDAT[0]);
             handle_vendorcommand(SETUPDAT[1]);
             return FALSE;

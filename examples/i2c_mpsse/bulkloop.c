@@ -261,15 +261,9 @@ BOOL handle_vendorcommand(BYTE cmd) {
          }
         }
         break;
-    case VENDOR_COMMAND:
-        {
-        if(!handle_mpsse())
-            return FALSE;
-        else
-            return TRUE;
-        }
-        break;
+
      default:
+          handle_mpsse();
           printf ( "Need to implement vendor command: %02x\n", cmd );
  }
  return FALSE;
@@ -333,6 +327,7 @@ BOOL handle_set_configuration(BYTE cfg) {
 
 // copied usb jt routines from usbjt.h
 void sudav_isr() __interrupt SUDAV_ISR {
+
 
 
   got_sud=TRUE;

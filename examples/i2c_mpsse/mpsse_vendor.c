@@ -17,9 +17,8 @@ extern void toggle_pins();
 BOOL handle_mpsse()
 {
 
-toggle_pins();
-SUDPTRCTL = 0x01;
-        switch (SETUPDAT[0])
+//SUDPTRCTL = 0x01;
+        switch (SETUPDAT[1])
         {
 
         case MPSSE_BITBANG:
@@ -33,6 +32,17 @@ SUDPTRCTL = 0x01;
                 SUDPTRL = 03;
             }
             break;
+
+        case MPSSE_TWO:
+        {
+                EP0CS |= 0x80;
+                EP0BUF[0] = 1;
+                EP0BUF[1] =2;
+                EP0BCH= 0;
+                EP0BCL = 2;
+                SUDPTRL = 2;
+        }
+        break;
         default:
             return FALSE;
 
