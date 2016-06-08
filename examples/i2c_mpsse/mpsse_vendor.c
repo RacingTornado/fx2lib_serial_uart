@@ -24,12 +24,16 @@ BOOL handle_mpsse()
         case MPSSE_BITBANG:
             {
 
-                EP0CS |= 0x80;
+                //EP0CS |= 0x80;
+                toggle_pins();
+                toggle_pins();
                 EP0BUF[0]=01;
                 EP0BUF[1]= 06;
                 EP0BCH=0;
                 EP0BCL=2;
-                SUDPTRL = 03;
+                //SUDPTRL = 03;
+                //EP0CS = EP0CS & 0x7f;
+                EP0CS |= 0x80;
             }
             break;
 
