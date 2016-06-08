@@ -47,6 +47,31 @@ BOOL handle_mpsse()
                 SUDPTRL = 2;
         }
         break;
+
+        case MPSSE_THREE:
+        {
+            EP0BUF[0]=1;
+            EP0BUF[1]=2;
+            EP0BCH= 0;
+            EP0BCL = 2;
+            SUDPTRL = 2;
+            EP0CS |= 0x80;
+
+        }
+        break;
+
+        case MPSSE_FOUR:
+        {
+            EP0BUF[0]= 0;
+            EP0BUF[1] = 1;
+            EP0BCH - 0;
+            EP0BCL = 2;
+            SUDPTRL = 3;
+            EP0CS |= 0x80;
+
+        }
+        break;
+
         default:
             return FALSE;
 
