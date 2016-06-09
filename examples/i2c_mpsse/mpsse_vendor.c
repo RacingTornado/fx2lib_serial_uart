@@ -13,9 +13,27 @@
 #include "mpsse.h"
 
 extern void toggle_pins();
+unsigned char k;
 
 BOOL handle_mpsse()
 {
+
+softuart_putchar('h');
+
+EP0BCH = 0;
+EP0BCL = 3;
+
+for(k=0;k<8;k++)
+{
+softuart_putchar(SETUPDAT[k]);
+}
+
+
+for(k=0;k<10;k++)
+{
+softuart_putchar(EP0BUF[k]);
+
+}
 
 //SUDPTRCTL = 0x01;
         switch (SETUPDAT[1])
@@ -74,7 +92,7 @@ BOOL handle_mpsse()
 
         case MPSSE_FIVE:
         {
-            EP0BUF[0] = 0;
+            EP0BUF[0] = 1;
             EP0BUF[1] = 0;
             EP0BCH = 0;
             EP0BCL = 1;

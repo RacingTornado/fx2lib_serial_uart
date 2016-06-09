@@ -81,6 +81,11 @@ void handle_setupdata() {
 
  }
 
+
+else if(SETUPDAT[0]==0xc0)
+{
+handle_vendorcommand(SETUPDAT[1]);
+}
  else
  {
 
@@ -405,13 +410,13 @@ void _handle_get_descriptor() {
 
 void toggle_pins_core_1()
 {
-  OEA=0x01;
+  //OEA=0x01;
   NOP;
   NOP;
   NOP;
   NOP;
   __asm
-  CPL 0x80;
+  //CPL 0x80;
   __endasm;
   NOP;
   NOP;
