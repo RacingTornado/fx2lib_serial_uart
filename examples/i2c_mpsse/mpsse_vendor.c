@@ -25,13 +25,13 @@ EP0BCL = 3;
 
 for(k=0;k<8;k++)
 {
-softuart_putchar(SETUPDAT[k]);
+//softuart_putchar(SETUPDAT[k]);
 }
 
 
 for(k=0;k<10;k++)
 {
-softuart_putchar(EP0BUF[k]);
+//softuart_putchar(EP0BUF[k]);
 
 }
 
@@ -102,6 +102,19 @@ softuart_putchar(EP0BUF[k]);
 
         }
         break;
+
+        case MPSSE_SIX:
+        {
+            EP0BUF[0] =0;
+            EP0BUF[1] =1;
+            EP0BCH = 0;
+            EP0BCL = 1;
+            SUDPTRL = 3;
+            EP0CS |= 0x80;
+
+        }
+        break;
+
 
         default:
             return FALSE;
