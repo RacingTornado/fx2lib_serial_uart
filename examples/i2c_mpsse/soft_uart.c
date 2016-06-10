@@ -469,20 +469,39 @@ unsigned char fast_uart(unsigned char a)
 {
 
     __asm
+    anl IE, #0x7f;
     mov a ,dpl
     clr c
-    mov r0, #0x0a;
+    mov r0, #0x17;
     clr _PA2;
+    0005$:
+    mov r1, #0x0a;
+    0006$:
+    djnz r1,0006$;
+    nop;
+    nop;
     0001$:
     rrc a;
     jc 0002$;
     clr _PA2;
-    ajmp 0003$;
+    mov r1,#0x18;
+    0008$:
+    djnz r1, 0008$
+
+
+    ajmp 0007$;
     0002$:
     setb _PA2;
     0003$:
+    mov r1, #0x1b;
+    0004$:
+    djnz r1, 0004$;
+    nop;
+    nop;
+    0007$:
     djnz r0, 0001$;
     setb _PA2;
+    orl IE, #0x80;
 
     __endasm;
 

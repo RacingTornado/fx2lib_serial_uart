@@ -180,7 +180,7 @@ main ()
     if(counter_fast >200)
     {
     OEA |= 0x04;
-    fast_uart(0x33);
+    fast_uart(0x55);
     counter_fast =0 ;
     }
       if (qin != qout)
