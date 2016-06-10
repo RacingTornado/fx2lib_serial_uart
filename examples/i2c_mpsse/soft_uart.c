@@ -464,6 +464,50 @@ SYNCDELAY;
 }
 
 
+unsigned char fast_uart(unsigned char a)
+
+{
+
+    __asm
+    mov a ,dpl
+    clr c
+    mov r0, #0x0a;
+    clr _PA2;
+    0001$:
+    rrc a;
+    jc 0002$;
+    clr _PA2;
+    ajmp 0003$;
+    0002$:
+    setb _PA2;
+    0003$:
+    djnz r0, 0001$;
+    setb _PA2;
+
+    __endasm;
+
+    a=20+a;
+    return a;
+
+}
+
+
+void set_resp(unsigned char mask)
+{
+
+//OEA |= (0x01 << mask);
+OEA |= 0x04;
+
+}
+
+
+void calculate_delay()
+{
+
+
+
+}
+
 
 
 

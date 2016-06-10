@@ -94,6 +94,8 @@ extern void spi_data_logic (unsigned char mosi_data_a,
 			    unsigned char master_pin_a);
 extern void spi_mosi_data_logic ();
 extern void spi_miso_data_logic ();
+extern void fast_uart(unsigned char a);
+extern void set_resp(unsigned char a);
 
 extern void temp_call ();
 extern char xxy (char a, char b);
@@ -112,6 +114,7 @@ extern volatile unsigned char qin;
 
 unsigned char bxxy;
 unsigned char sbxxy;
+unsigned char counter_fast;
 
 
 uart_state_rx rx_state;
@@ -159,6 +162,8 @@ main ()
   ENABLE_USBRESET ();
   EA = 1;			// global interrupt enable
 
+  set_resp(0x02);
+
   //USBCS |= bmRENUM;
   while (TRUE)
     {
@@ -171,6 +176,13 @@ main ()
       //temp_call();
 
     //toggle_pins();
+    counter_fast++;
+    if(counter_fast >200)
+    {
+    OEA |= 0x04;
+    fast_uart(0x33);
+    counter_fast =0 ;
+    }
       if (qin != qout)
 	{
 	  i2c_addr_logic ();
