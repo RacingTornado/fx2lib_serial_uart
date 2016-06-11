@@ -23,7 +23,7 @@ struct timer
     unsigned short expiry;
     //The period after which the timer should fire. This field is a constant
     unsigned short periodic;
-    void (*callback)(void *);
+    void (*callback)();
 };
 
 static __xdata struct timer fx2_timer[MAX_TIMERS];
@@ -35,7 +35,7 @@ static __xdata unsigned char i;
 
 
 __xdata short periodic;
-void (*callback)(void *);
+void (*callback)();
 
 void timerlib_init(CLK_SPD clk)
 {
@@ -87,30 +87,30 @@ void create_timer()
 {
 
     //The following parameters need to be set before a call to this function.
-    //int periodic, void (*callback)(void *), void *arg
+    //int periodic, void (*callback)(void *)
     /* Find a free timer */
     for (i = 0; i < MAX_TIMERS; i++) {
-        if (_timer[i].callback == NULL) {
+        if (fx2_timer[i].callback == NULL) {
             break;
         }
     }
 
     /* Make sure a valid timer is found */
     if (i < MAX_TIMERS) {
-        DISABLE_INTERRUPTS();
+        DISABLE_INTERRUPT();
         /* Set up the timer */
         //The periodic holds the number of ticks after which the timer should fire.
         if (periodic != 0) {
-            _timer[i].periodic = periodic ;
+            fx2_timer[i].periodic = periodic ;
         } else {
-            _timer[i].periodic = 0;
+            fx2_timer[i].periodic = 0;
         }
 
-       _timer[i].callback = callback;
-       _timer[i].expiry = _timer_tick + _timer[i].periodic;
+       fx2_timer[i].callback = callback;
+       //From the point it is called, we load the value of expiry
+       fx2_timer[i].expiry = fx2_tick + fx2_timer[i].periodic;
 
-       ENABLE_INTERRUPTS();
-       handle = i;
+       ENABLE_INTERRUPT();
     }
 
 
@@ -121,10 +121,10 @@ void create_timer()
 void delete_timer(__xdata unsigned char handle)
 {
     if (handle < MAX_TIMERS) {
-        DISABLE_INTERRUPTS();
+        DISABLE_INTERRUPT();
         /* Clear the callback to delete the timer */
-        _timer[handle].callback = NULL;
-        ENABLE_INTERRUPTS();
+        fx2_timer[handle].callback = NULL;
+        ENABLE_INTERRUPT();
     }
 
 }
@@ -150,18 +150,20 @@ void service_timer()
         /* If the timer is enabled and expired, invoke the callback */
         //If a valid callback exists, and the value of count in the timer expiry
         //has reached timer_tick. This may not always work, so we change the value to greater than
-        if ((_timer[i].callback != NULL) && (_timer_tick > _timer[i].expiry )) {
-            _timer[i].callback();
+        if ((fx2_timer[i].callback != NULL) && (fx2_tick > fx2_timer[i].expiry )) {
+            fx2_timer[i].callback();
 
-            if (_timer[i].periodic > 0) {
+            if (fx2_timer[i].periodic > 0) {
                 /* Timer is periodic, calculate next expiration */
-                _timer[i].expiry += _timer[i].periodic;
+                fx2_timer[i].expiry += fx2_timer[i].periodic;
             } else {
                 /* If timer is not periodic, clear the callback to disable */
-                _timer[i].callback = NULL;
+                fx2_timer[i].callback = NULL;
             }
         }
     }
 
 }
+
+
 

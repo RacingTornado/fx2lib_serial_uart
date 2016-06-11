@@ -103,6 +103,8 @@ extern void temp_call ();
 extern char xxy (char a, char b);
 extern BOOL handle_mpsse ();
 extern void timerlib_init(CLK_SPD clk);
+extern void create_timer();
+void call_me();
 
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
@@ -115,10 +117,11 @@ extern unsigned char qout;
 extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
 extern volatile unsigned char qin;
 extern __xdata unsigned char interval;
+extern __xdata unsigned short periodic;
 
-unsigned char sbxxy;
-unsigned char counter_fast;
 extern  __xdata  volatile unsigned short fx2_tick ;
+extern  void (*callback)();
+
 
 
 
@@ -172,7 +175,9 @@ main ()
   //5us interval
   interval = 5;
   timerlib_init(CLK_48M);
-
+  periodic = 20;
+  callback = call_me;
+  create_timer();
 
   //USBCS |= bmRENUM;
   while (TRUE)
@@ -533,7 +538,7 @@ sudav_isr ()
     void timer0_isr () __interrupt TF0_ISR
     {
 
-    _timer_tick++;
+    fx2_tick++;
 
     }
 
@@ -577,6 +582,9 @@ uart_rx_fill ()
 
 }
 
-
+void call_me()
+{
+    fast_uart(0x47);
+}
 
 
