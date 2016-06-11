@@ -564,6 +564,11 @@ sudav_isr ()
 	 }
      }
 
+     void timer0_isr() __interrupt TF0_ISR
+     {
+
+     }
+
 
 
 
