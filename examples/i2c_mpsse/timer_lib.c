@@ -27,8 +27,8 @@ struct timer
     void *arg;
 };
 
-__xdata static struct timer fx2_timer[MAX_TIMERS];
-__xdata static volatile unsigned short fx2_tick = 0;
+//static __xdata struct timer fx2_timer[MAX_TIMERS];
+static __xdata volatile unsigned short fx2_tick = 0;
 
 
 

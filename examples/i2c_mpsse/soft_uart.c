@@ -472,10 +472,10 @@ unsigned char fast_uart(unsigned char a)
     anl IE, #0x7f;
     mov a ,dpl
     clr c
-    mov r0, #0x17;
+    mov r0, #0x08;
     clr _PA2;
     0005$:
-    mov r1, #0x0a;
+    mov r1, #0x17;
     0006$:
     djnz r1,0006$;
     nop;

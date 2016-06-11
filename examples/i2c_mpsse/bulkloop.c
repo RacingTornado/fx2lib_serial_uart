@@ -180,7 +180,7 @@ main ()
     if(counter_fast >200)
     {
     OEA |= 0x04;
-    fast_uart(0x55);
+    fast_uart(0x43);
     counter_fast =0 ;
     }
       if (qin != qout)
@@ -564,10 +564,7 @@ sudav_isr ()
 	 }
      }
 
-     void timer0_isr() __interrupt TF0_ISR
-     {
 
-     }
 
 
 
