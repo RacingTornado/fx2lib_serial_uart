@@ -216,7 +216,7 @@ void uart_config()
     */
 
 
-
+    //Timer 1 increments forevery 12 clock cycles with this bit set in CKCON
     CKCON &= ~(0x08);
     /*
     ╔════════╤═══════════════════════════════════════════════════════════════════════════╗
