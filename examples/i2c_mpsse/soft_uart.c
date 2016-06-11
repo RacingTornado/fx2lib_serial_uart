@@ -484,19 +484,20 @@ unsigned char fast_uart(unsigned char a)
     rrc a;
     jc 0002$;
     clr _PA2;
-    mov r1,#0x18;
+    mov r1,#0x1e;
     0008$:
     djnz r1, 0008$
+    nop;
+
 
 
     ajmp 0007$;
     0002$:
     setb _PA2;
     0003$:
-    mov r1, #0x1b;
+    mov r1, #0x1f;
     0004$:
     djnz r1, 0004$;
-    nop;
     nop;
     0007$:
     djnz r0, 0001$;
