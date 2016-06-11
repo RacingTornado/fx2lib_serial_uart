@@ -113,8 +113,8 @@ extern volatile unsigned char flag_rx_ready;
 extern unsigned char qout;
 extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
 extern volatile unsigned char qin;
+extern __xdata unsigned char interval;
 
-unsigned char bxxy;
 unsigned char sbxxy;
 unsigned char counter_fast;
 
@@ -165,62 +165,19 @@ main ()
   EA = 1;			// global interrupt enable
 
   set_resp(0x02);
-  timerlib_init(CLK_12M);
+  interval = 5;
+  timerlib_init(CLK_48M);
 
   //USBCS |= bmRENUM;
   while (TRUE)
     {
-      //toggle_pins();
-      //Handles device descriptor requests
-      //softuart_putchar(0x3c);
-      //softuart_putchar(softuart_getchar());
-      //uart_rx_fill();
-      //i2c_bitbang();
-      //temp_call();
 
-    //toggle_pins();
-    counter_fast++;
-    if(counter_fast >200)
-    {
-    OEA |= 0x04;
-    //fast_uart(0x34);
-    counter_fast =0 ;
-    }
       if (qin != qout)
 	{
-	  i2c_addr_logic ();
-	  bxxy = i2c_data_logic (0x60);
-	  i2c_stop_logic ();
 	  softuart_putchar (inbuf[qout]);
-	  softuart_putchar (0x3d);
-	  softuart_putchar (bxxy);
 	  putchar_a (inbuf[qout]);
-	  putchar_a (0x25);
-
-
-	  //spi_data_logic(0x23,0x60);
-	  //spi_data_logic(0x56,0x28);
-	  //PA2 = 0;
-	  //OEA = 0x04;
-	  //SYNCDELAY;
-	  //PA2 = 1;
-	  //SYNCDELAY;
-	  //spi_mosi_data_logic();
-	  //spi_miso_data_logic();
-	  //spi_data_logic(0x23,0x64);
-	  //spi_data_logic(0x56,0x2C);
-	  //spi_data_logic(0x23,0x64);
-	  //spi_mosi_data_logic();
-	  //spi_miso_data_logic();
-	  //PA2 = 0;
-	  //SYNCDELAY;
 	  softuart_putchar (inbuf[qout]);
-	  softuart_putchar (0x3d);
 	  putchar_a (inbuf[qout]);
-	  putchar_a (0x25);
-
-
-
 	  qout++;
 	  if (qout == SOFTUART_IN_BUF_SIZE)
 	    {

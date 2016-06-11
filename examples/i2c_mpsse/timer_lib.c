@@ -31,7 +31,8 @@ struct timer
 
 static __xdata struct timer fx2_timer[MAX_TIMERS];
 static __xdata  volatile unsigned short fx2_tick = 0;
-
+static __xdata unsigned char to_load;
+__xdata unsigned char interval;
 
 
 void timerlib_init(CLK_SPD clk)
@@ -53,6 +54,9 @@ void timerlib_init(CLK_SPD clk)
         break;
         case CLK_48M:
         {
+            to_load = (interval*1000)/(83);
+            to_load = 0xff - to_load;
+            fast_uart(to_load);
 
         }
         break;
