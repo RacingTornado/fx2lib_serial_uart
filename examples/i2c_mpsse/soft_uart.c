@@ -468,6 +468,7 @@ unsigned char fast_uart(unsigned char a)
 
 {
 
+    OEA |= 0x04;
     __asm
     anl IE, #0x7f;
     mov a ,dpl

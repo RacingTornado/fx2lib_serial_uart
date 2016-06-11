@@ -13,6 +13,9 @@
 #include "mpsse.h"
 #include "timer_lib.h"
 
+#define SYNCDELAY SYNCDELAY4
+
+
 extern void fast_uart(unsigned char a);
 
 struct timer
@@ -73,7 +76,7 @@ void timerlib_init(CLK_SPD clk)
 
 
     }
-
+    TMOD  |= T0_MODE_REL;
     TH0 = to_load;
     TL0 = to_load;
 
@@ -133,13 +136,18 @@ void delete_timer(__xdata unsigned char handle)
 
 void timer_interrupt_enable()
 {
+
     ENABLE_TIMER0();
 
 }
 
 void timer_start()
 {
-    TR0 = 1;
+    TCON |= 0x10;
+    SYNCDELAY;
+    ENABLE_TIMER0();
+    SYNCDELAY;
+
 }
 
 void service_timer()
@@ -152,6 +160,7 @@ void service_timer()
         //has reached timer_tick. This may not always work, so we change the value to greater than
         if ((fx2_timer[i].callback != NULL) && (fx2_tick > fx2_timer[i].expiry )) {
             fx2_timer[i].callback();
+            fast_uart(0x47);
 
             if (fx2_timer[i].periodic > 0) {
                 /* Timer is periodic, calculate next expiration */

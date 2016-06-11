@@ -105,6 +105,8 @@ extern BOOL handle_mpsse ();
 extern void timerlib_init(CLK_SPD clk);
 extern void create_timer();
 void call_me();
+extern void service_timer();
+extern void timer_start();
 
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
@@ -175,13 +177,22 @@ main ()
   //5us interval
   interval = 5;
   timerlib_init(CLK_48M);
+  timer_start();
   periodic = 20;
   callback = call_me;
   create_timer();
 
+
+
+
+
+
   //USBCS |= bmRENUM;
   while (TRUE)
     {
+
+
+    service_timer();
 
       if (qin != qout)
 	{
@@ -224,12 +235,12 @@ main ()
 	  //toggle_pins();
 
 	}
-
-      // Timer expiration; send buffered data
-      if ((TCON & 0x20))
-	{
-	  ProcessXmitData ();
-	}
+//
+//      // Timer expiration; send buffered data
+//      if ((TCON & 0x20))
+//	{
+//	  ProcessXmitData ();
+//	}
 
 
 
@@ -539,6 +550,7 @@ sudav_isr ()
     {
 
     fx2_tick++;
+    //fast_uart(0x22);
 
     }
 
