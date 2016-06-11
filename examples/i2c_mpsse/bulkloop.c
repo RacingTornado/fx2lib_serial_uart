@@ -63,6 +63,7 @@ unsigned char pin_data;
 unsigned char buf_data;
 unsigned char bit_number;
 unsigned char pin_state;
+static __xdata unsigned char i;
 
 
 typedef enum
@@ -120,6 +121,19 @@ extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
 extern volatile unsigned char qin;
 extern __xdata unsigned char interval;
 extern __xdata unsigned short periodic;
+extern __xdata struct timer fx2_timer[MAX_TIMERS];
+extern struct timer
+{
+    //The number of ticks after which the task should fire.
+    //This keeps getting incremented until it finally rolls over and starts back
+    //A short is about 2 bytes on SDCC. So 65535 is the maximum count it can measure.
+    unsigned short expiry;
+    //The period after which the timer should fire. This field is a constant
+    unsigned short periodic;
+    unsigned char set;
+    void (*callback)();
+};
+
 
 extern  __xdata  volatile unsigned short fx2_tick ;
 extern  void (*callback)();
@@ -549,8 +563,22 @@ sudav_isr ()
     void timer0_isr () __interrupt TF0_ISR
     {
 
+
     fx2_tick++;
     //fast_uart(0x22);
+    for (i = 0; i < MAX_TIMERS; i++) {
+        /* If the timer is enabled and expired, invoke the callback */
+        //If a valid callback exists, and the value of count in the timer expiry
+        //has reached timer_tick. This may not always work, so we change the value to greater than
+        if ((fx2_tick == fx2_timer[i].expiry )) {
+                fx2_timer[i].set = 0x01;
+                //fast_uart(0x47);
+                /* Timer is periodic, calculate next expiration */
+                fx2_timer[i].expiry = fx2_timer[i].periodic + fx2_tick;
+
+
+        }
+    }
 
     }
 

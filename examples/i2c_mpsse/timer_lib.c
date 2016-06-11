@@ -26,10 +26,11 @@ struct timer
     unsigned short expiry;
     //The period after which the timer should fire. This field is a constant
     unsigned short periodic;
+    unsigned char set;
     void (*callback)();
 };
 
-static __xdata struct timer fx2_timer[MAX_TIMERS];
+__xdata struct timer fx2_timer[MAX_TIMERS];
 //Incremented via ISR
 __xdata  volatile unsigned short fx2_tick = 0;
 static __xdata unsigned char to_load;
@@ -110,6 +111,7 @@ void create_timer()
         }
 
        fx2_timer[i].callback = callback;
+       fx2_timer[i].set = 0x00;
        //From the point it is called, we load the value of expiry
        fx2_timer[i].expiry = fx2_tick + fx2_timer[i].periodic;
 
@@ -153,22 +155,18 @@ void timer_start()
 void service_timer()
 {
 
-
      for (i = 0; i < MAX_TIMERS; i++) {
         /* If the timer is enabled and expired, invoke the callback */
         //If a valid callback exists, and the value of count in the timer expiry
         //has reached timer_tick. This may not always work, so we change the value to greater than
-        if ((fx2_timer[i].callback != NULL) && (fx2_tick > fx2_timer[i].expiry )) {
-            fx2_timer[i].callback();
-            //fast_uart(0x47);
-
-            if (fx2_timer[i].periodic > 0) {
+        if ((fx2_timer[i].callback != NULL) && (fx2_timer[i].set == 0x01 )) {
+                fx2_timer[i].callback();
+                fx2_timer[i].set= 0x00;
+                fast_uart(0x47);
                 /* Timer is periodic, calculate next expiration */
-                fx2_timer[i].expiry += fx2_timer[i].periodic;
-            } else {
-                /* If timer is not periodic, clear the callback to disable */
-                fx2_timer[i].callback = NULL;
-            }
+                fx2_timer[i].expiry = fx2_timer[i].periodic + fx2_tick;
+
+
         }
     }
 
