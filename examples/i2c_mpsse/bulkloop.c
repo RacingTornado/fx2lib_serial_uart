@@ -596,7 +596,7 @@ uart_rx_fill ()
 
 void call_me()
 {
-    fast_uart(0x47);
+    fast_uart(0x55);
 }
 
 

@@ -160,7 +160,7 @@ void service_timer()
         //has reached timer_tick. This may not always work, so we change the value to greater than
         if ((fx2_timer[i].callback != NULL) && (fx2_tick > fx2_timer[i].expiry )) {
             fx2_timer[i].callback();
-            fast_uart(0x47);
+            //fast_uart(0x47);
 
             if (fx2_timer[i].periodic > 0) {
                 /* Timer is periodic, calculate next expiration */
