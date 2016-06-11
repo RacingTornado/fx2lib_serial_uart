@@ -189,7 +189,7 @@ main ()
   set_resp(0x02);
 
   //5us interval
-  interval = 40;
+  interval = 60;
   timerlib_init(CLK_48M);
   timer_start();
   periodic = 20;
@@ -203,10 +203,10 @@ main ()
     //ET0 = 1;
 
 
-    while(TRUE)
-    {
-
-    }
+//    while(TRUE)
+//    {
+//
+//    }
 
 
   //USBCS |= bmRENUM;
