@@ -535,6 +535,42 @@ __asm
 
 }
 
+unsigned char uart_rcv_tx(unsigned char a)
+
+{
+
+    OEA |= 0x04;
+
+__asm
+
+    anl IE, #0x7f;
+    0002$:
+    mov c, _PA2
+    jc 0002$;
+    mov r0, #0x08;
+    mov r1, #0x17;
+    0006$:
+    djnz r1,0006$;
+    nop;
+    nop;
+    0001$:
+    mov c, _PA2
+    rlc a;
+    mov r1, #0x1F;
+    0004$:
+    djnz r1, 0004$;
+    nop;
+    djnz r0, 0001$;
+    mov dpl,a
+    orl IE, #0x80;
+
+__endasm;
+
+    a=20+a;
+    return a;
+
+}
+
 
 void set_resp(unsigned char mask)
 {

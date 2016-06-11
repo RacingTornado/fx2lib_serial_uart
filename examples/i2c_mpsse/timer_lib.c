@@ -26,7 +26,6 @@ struct timer
     unsigned char expiry;
     //The period after which the timer should fire. This field is a constant
     unsigned char periodic;
-    unsigned char set;
     void (*callback)();
 };
 
@@ -35,7 +34,7 @@ __xdata struct timer fx2_timer[MAX_TIMERS];
 __xdata  volatile unsigned short fx2_tick = 0;
 static __xdata unsigned char to_load;
 __xdata unsigned char interval;
-static __xdata unsigned char i;
+__xdata unsigned char i;
 
 
 __xdata short periodic;
@@ -83,8 +82,8 @@ void timerlib_init(CLK_SPD clk)
     //TMOD = 0x02;
     //TMOD |= 0x02;
     //to_load = 0x10;
-    TH0 = 0xeb;
-    TL0 = 0xeb;
+    TH0 = 0x30;
+    TL0 = 0x30;
     //TR0 = 0;
     //TMOD = 0x02;
     //TH0 = 0x50;
@@ -130,7 +129,6 @@ void create_timer()
         }
 
        fx2_timer[i].callback = callback;
-       fx2_timer[i].set = 0x00;
        //From the point it is called, we load the value of expiry
        fx2_timer[i].expiry = fx2_tick + fx2_timer[i].periodic;
 
@@ -179,9 +177,14 @@ void service_timer()
         /* If the timer is enabled and expired, invoke the callback */
         //If a valid callback exists, and the value of count in the timer expiry
         //has reached timer_tick. This may not always work, so we change the value to greater than
-        if ((fx2_timer[i].callback != NULL) && (fx2_timer[i].expiry < fx2_tick )) {
+
+
+
+
+        if ((fx2_timer[i].callback != NULL) && ( fx2_tick > fx2_timer[i].periodic)) {
+                fx2_tick = 0;
                 fx2_timer[i].callback();
-                fx2_timer[i].set= 0x00;
+
                 //fast_uart(0x47);
                 /* Timer is periodic, calculate next expiration */
                 //fast_uart(fx2_timer[i].expiry);

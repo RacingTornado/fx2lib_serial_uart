@@ -2,7 +2,7 @@
 #define TIMER_LIB
 
 
-#define MAX_TIMERS 5
+#define MAX_TIMERS 2
 
 #define CKCON_T0 0x08
 #define CKCON_T1 0x10
