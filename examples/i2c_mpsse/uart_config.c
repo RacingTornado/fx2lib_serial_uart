@@ -112,10 +112,7 @@ static void SetupCommand(void)
 static void Initialize(void)
 {
 	// Note that increasing the clock speed to 24 or 48 MHz would
-	// affect our timer calculations below.  I use 12 MHz because
-	// this lets me use the smallest numbers for our counter (i.e,
-	// 40000 for the default 40 ms latency); the counter is only
-	// sixteen bits.
+	// affect our timer calculations below.
     CPUCS=0x10;
     SYNCDELAY;
 	IFCONFIG=0xc0;  // Internal IFCLK, 48MHz; A,B as normal ports.
