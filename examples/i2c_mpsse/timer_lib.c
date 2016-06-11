@@ -19,6 +19,8 @@
 #define CKCON_T2 0x20
 #define T0_MODE_REL 0x02
 
+extern void fast_uart(unsigned char a);
+
 struct timer
 {
     unsigned short expiry;
@@ -32,11 +34,36 @@ static __xdata  volatile unsigned short fx2_tick = 0;
 
 
 
-void timerlib_init()
+void timerlib_init(CLK_SPD clk)
 {
 
     CKCON |= CKCON_T0;
     TMOD  |= T0_MODE_REL;
+    switch(clk)
+    {
+        case CLK_12M:
+        {
+            fast_uart(0x32);
+        }
+        break;
+        case CLK_24M:
+        {
+
+        }
+        break;
+        case CLK_48M:
+        {
+
+        }
+        break;
+        default:
+        {
+
+        }
+
+
+    }
+
 
 }
 

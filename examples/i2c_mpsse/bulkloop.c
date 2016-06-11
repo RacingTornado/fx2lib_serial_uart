@@ -97,9 +97,11 @@ extern void spi_miso_data_logic ();
 extern void fast_uart(unsigned char a);
 extern void set_resp(unsigned char a);
 
+
 extern void temp_call ();
 extern char xxy (char a, char b);
 extern BOOL handle_mpsse ();
+extern void timerlib_init(CLK_SPD clk);
 
 extern volatile unsigned char flag_tx_busy;
 extern volatile unsigned char timer_tx_ctr;
@@ -163,6 +165,7 @@ main ()
   EA = 1;			// global interrupt enable
 
   set_resp(0x02);
+  timerlib_init(CLK_12M);
 
   //USBCS |= bmRENUM;
   while (TRUE)
@@ -180,7 +183,7 @@ main ()
     if(counter_fast >200)
     {
     OEA |= 0x04;
-    fast_uart(0x34);
+    //fast_uart(0x34);
     counter_fast =0 ;
     }
       if (qin != qout)
