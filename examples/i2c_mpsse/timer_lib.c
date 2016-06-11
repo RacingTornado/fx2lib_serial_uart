@@ -23,9 +23,9 @@ struct timer
     //The number of ticks after which the task should fire.
     //This keeps getting incremented until it finally rolls over and starts back
     //A short is about 2 bytes on SDCC. So 65535 is the maximum count it can measure.
-    unsigned short expiry;
+    unsigned char expiry;
     //The period after which the timer should fire. This field is a constant
-    unsigned short periodic;
+    unsigned char periodic;
     unsigned char set;
     void (*callback)();
 };
@@ -173,17 +173,22 @@ void timer_start()
 
 void service_timer()
 {
+    //fast_uart(0x34);
 
      for (i = 0; i < MAX_TIMERS; i++) {
         /* If the timer is enabled and expired, invoke the callback */
         //If a valid callback exists, and the value of count in the timer expiry
         //has reached timer_tick. This may not always work, so we change the value to greater than
-        if ((fx2_timer[i].callback != NULL) && (fx2_timer[i].set == 0x01 )) {
+        if ((fx2_timer[i].callback != NULL) && (fx2_timer[i].expiry < fx2_tick )) {
                 fx2_timer[i].callback();
                 fx2_timer[i].set= 0x00;
-                fast_uart(0x47);
+                //fast_uart(0x47);
                 /* Timer is periodic, calculate next expiration */
+                //fast_uart(fx2_timer[i].expiry);
+                DISABLE_INTERRUPT();
                 fx2_timer[i].expiry = fx2_timer[i].periodic + fx2_tick;
+                ENABLE_INTERRUPT();
+                //fast_uart(fx2_timer[i].expiry);
 
 
         }

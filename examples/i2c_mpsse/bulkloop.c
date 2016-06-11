@@ -215,48 +215,49 @@ main ()
 
 
     service_timer();
+    //fast_uart(0x45);
 
-      if (qin != qout)
-	{
-	  softuart_putchar (inbuf[qout]);
-	  putchar_a (inbuf[qout]);
-	  softuart_putchar (inbuf[qout]);
-	  putchar_a (inbuf[qout]);
-	  qout++;
-	  if (qout == SOFTUART_IN_BUF_SIZE)
-	    {
-	      qout = 0;
-
-	    }
-
-
-
-	}
-
-      //if ( got_sud ) {
-      if (anotherone >0 )
-	{
-	  toggle_pins ();
-	  toggle_pins ();
-      toggle_pins();
-	  toggle_pins();
-	  handle_setupdata ();
-	  anotherone --;
-	}
-	else
-	{
-        //toggle_pins();
-	}
-
-
-
-      // Input data on EP1
-      if (!(EP1OUTCS & bmEPBUSY))
-	{
-	  ProcessRecvData ();
-	  //toggle_pins();
-
-	}
+//      if (qin != qout)
+//	{
+//	  softuart_putchar (inbuf[qout]);
+//	  putchar_a (inbuf[qout]);
+//	  softuart_putchar (inbuf[qout]);
+//	  putchar_a (inbuf[qout]);
+//	  qout++;
+//	  if (qout == SOFTUART_IN_BUF_SIZE)
+//	    {
+//	      qout = 0;
+//
+//	    }
+//
+//
+//
+//	}
+//
+//      //if ( got_sud ) {
+//      if (anotherone >0 )
+//	{
+//	  toggle_pins ();
+//	  toggle_pins ();
+//      toggle_pins();
+//	  toggle_pins();
+//	  handle_setupdata ();
+//	  anotherone --;
+//	}
+//	else
+//	{
+//        //toggle_pins();
+//	}
+//
+//
+//
+//      // Input data on EP1
+//      if (!(EP1OUTCS & bmEPBUSY))
+//	{
+////	  ProcessRecvData ();
+//	  //toggle_pins();
+//
+//	}
 //
 //      // Timer expiration; send buffered data
 //      if ((TCON & 0x20))
@@ -571,16 +572,16 @@ sudav_isr ()
     void timer0_isr () __interrupt TF0_ISR
     {
 
-        __asm
+
+            __asm
     mov _OEA, #0x08
     cpl _PA3
     __endasm;
 
 
 
-
-//    fx2_tick++;
-//    //fast_uart(0x22);
+    fx2_tick++;
+    //fast_uart(0x22);
 //    for (i = 0; i < MAX_TIMERS; i++) {
 //        /* If the timer is enabled and expired, invoke the callback */
 //        //If a valid callback exists, and the value of count in the timer expiry
@@ -640,7 +641,8 @@ uart_rx_fill ()
 
 void call_me()
 {
-    //fast_uart(0x55);
+    fast_uart(0x55);
+
 
 }
 
