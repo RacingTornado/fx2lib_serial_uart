@@ -189,16 +189,24 @@ main ()
   set_resp(0x02);
 
   //5us interval
-  interval = 5;
+  interval = 40;
   timerlib_init(CLK_48M);
   timer_start();
   periodic = 20;
   callback = call_me;
   create_timer();
+    //TR0=0;
+    //TMOD= 0x02;
+    //TH0 = 0xc0;
+    //TL0 = 0x40;
+    //TR0 = 1;
+    //ET0 = 1;
 
 
+    while(TRUE)
+    {
 
-
+    }
 
 
   //USBCS |= bmRENUM;
@@ -563,22 +571,30 @@ sudav_isr ()
     void timer0_isr () __interrupt TF0_ISR
     {
 
-
-    fx2_tick++;
-    //fast_uart(0x22);
-    for (i = 0; i < MAX_TIMERS; i++) {
-        /* If the timer is enabled and expired, invoke the callback */
-        //If a valid callback exists, and the value of count in the timer expiry
-        //has reached timer_tick. This may not always work, so we change the value to greater than
-        if ((fx2_tick == fx2_timer[i].expiry )) {
-                fx2_timer[i].set = 0x01;
-                //fast_uart(0x47);
-                /* Timer is periodic, calculate next expiration */
-                fx2_timer[i].expiry = fx2_timer[i].periodic + fx2_tick;
+        __asm
+    mov _OEA, #0x08
+    cpl _PA3
+    __endasm;
 
 
-        }
-    }
+
+
+//    fx2_tick++;
+//    //fast_uart(0x22);
+//    for (i = 0; i < MAX_TIMERS; i++) {
+//        /* If the timer is enabled and expired, invoke the callback */
+//        //If a valid callback exists, and the value of count in the timer expiry
+//        //has reached timer_tick. This may not always work, so we change the value to greater than
+//        if ((fx2_tick == fx2_timer[i].expiry )) {
+//                fx2_timer[i].set = 0x01;
+//                //fast_uart(0x47);
+//                /* Timer is periodic, calculate next expiration */
+//                fx2_timer[i].expiry = fx2_timer[i].periodic + fx2_tick;
+//
+//
+//        }
+//    }
+
 
     }
 
@@ -624,7 +640,8 @@ uart_rx_fill ()
 
 void call_me()
 {
-    fast_uart(0x55);
+    //fast_uart(0x55);
+
 }
 
 

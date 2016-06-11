@@ -43,28 +43,29 @@ void (*callback)();
 
 void timerlib_init(CLK_SPD clk)
 {
-
-    CKCON |= CKCON_T0;
+    interval= 100;
+    TR0 = 0x00;
+    //CKCON |= CKCON_T0;
     TMOD  |= T0_MODE_REL;
     switch(clk)
     {
         case CLK_12M:
         {
-            to_load = (interval*1000)/(83*4);
+            to_load = (interval*1000)/(20*4*3);
             to_load = 0xff - to_load;
             fast_uart(to_load);
         }
         break;
         case CLK_24M:
         {
-            to_load = (interval*1000)/(83*2);
+            to_load = (interval*1000)/(20*2*3);
             to_load = 0xff - to_load;
             fast_uart(to_load);
         }
         break;
         case CLK_48M:
         {
-            to_load = (interval*1000)/(83);
+            to_load = (interval*1000)/(20*3);
             to_load = 0xff - to_load;
             fast_uart(to_load);
 
@@ -77,9 +78,24 @@ void timerlib_init(CLK_SPD clk)
 
 
     }
-    TMOD  |= T0_MODE_REL;
-    TH0 = to_load;
+    TMOD = 0x02;
+    //TMOD |= 0x02;
+    TH0 = 0xa0;
     TL0 = to_load;
+    //TR0 = 0;
+    //TMOD = 0x02;
+    //TH0 = 0x50;
+    //TL0 = 0x50;
+    //TR0 = 1;
+    //ET0 = 1;
+
+    //TR0=0;
+    //TMOD= 0x02;
+    //TH0 = 0xc0;
+    //TL0 = 0x40;
+    //TR0 = 1;
+    //ET0 = 1;
+
 
 
 }
