@@ -28,6 +28,7 @@
 #include <fx2ints.h>
 #include "softuart.h"
 #include "mpsse.h"
+#include "timer_lib.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -117,6 +118,8 @@ extern __xdata unsigned char interval;
 
 unsigned char sbxxy;
 unsigned char counter_fast;
+extern  __xdata  volatile unsigned short fx2_tick ;
+
 
 
 uart_state_rx rx_state;
@@ -165,8 +168,11 @@ main ()
   EA = 1;			// global interrupt enable
 
   set_resp(0x02);
+
+  //5us interval
   interval = 5;
   timerlib_init(CLK_48M);
+
 
   //USBCS |= bmRENUM;
   while (TRUE)
@@ -524,6 +530,13 @@ sudav_isr ()
 	 }
      }
 
+    void timer0_isr () __interrupt TF0_ISR
+    {
+
+    _timer_tick++;
+
+    }
+
 
 
 
@@ -563,3 +576,7 @@ uart_rx_fill ()
 
 
 }
+
+
+
+
