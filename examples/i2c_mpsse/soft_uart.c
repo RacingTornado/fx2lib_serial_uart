@@ -185,8 +185,9 @@ unsigned char volatile rx_count;
 
 
 unsigned volatile char tx_bits_sent;
-unsigned volatile char rx_bits_sent;
+unsigned volatile char rx_bits_rcvd;
 unsigned char volatile tx_busy;
+unsigned char volatile rx_busy;
 
 
 
@@ -361,6 +362,7 @@ void softuart_init( void )
 	QueueInitRX();
 	QueueInitTX();
 	tx_busy = 0;
+	rx_busy - 0;
 
 }
 
@@ -620,10 +622,23 @@ if( QueueCheckTX()!= 1)
 void uart_rx_service()
 {
 
-if(QueueCheckRX()!= 1 && (rx_count & 0x80)!=1 )
+// 0x00 - IDLE
+// 0x01 - Data Reception complete
+// 0x02 - Start bit detect
+// 0x03 - Data currently being read
+
+
+if(rx_busy == 0x01 )
 {
     //Load value
 //    QueueGetRX(rx_buffer);
+    //QueuePutTX(QueueInRX);
+    //QueuePutTX(QueueOutRX);
+    QueuePutTX(rx_buffer);
+    //QueuePutRX(rx_buffer);
+    //QueuePutTX(rx_buffer);
+    //rx_count = 0x00;
+    rx_busy = 0x00;
     //Busy. Operation is ongoing
     //Clear bit 7  indicates that operation has completed.
 //    rx_count  = 0x80;
@@ -748,13 +763,14 @@ __bit QueueGetRX(unsigned char *old)
     return 0; // No errors
 }
 
-
+//This function checks if Queue is full . If full, it returns 1
 __bit QueueCheckRX()
 {
-        if((QueueInTX == QueueOutTX))
+    if(QueueInRX == (( QueueOutRX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
     {
-        return 1; /* Queue Empty - nothing to get*/
+        return 1; /* Queue Full*/
     }
+
     return 0; // No errors
 }
 

@@ -108,8 +108,9 @@ extern unsigned char volatile tx_count;
 extern unsigned char volatile rx_count;
 
 extern unsigned char volatile tx_bits_sent;
-extern unsigned char volatile rx_bits_sent;
+extern unsigned char volatile rx_bits_rcvd;
 extern unsigned char volatile tx_busy;
+extern unsigned char volatile rx_busy;
 
 
 extern void QueueInitTX(void);
@@ -226,8 +227,8 @@ main ()
 
 
     service_timer();
-    QueuePutTX(0x55);
-    //uart_rx_service();
+    //QueuePutTX(0x55);
+    uart_rx_service();
     uart_tx_service();
 
 //          if (qin != qout)
@@ -494,7 +495,62 @@ sudav_isr ()
         tx_count = 0x00;
     }
 
+    rx_count = rx_count + 1;
 
+        if(rx_busy == 0x00)
+        {
+              __asm
+                anl _OEA, #0xdf;
+                mov c,_PA5;
+                jc 0001$;
+                mov _rx_count, #0x00
+                mov _rx_bits_rcvd, #0x00
+                mov _rx_busy , #0x02
+                0001$:
+              __endasm;
+        }
+
+
+if( (rx_count % 4)  == 0)
+{
+
+       if((rx_busy == 0x02) || (rx_busy == 0x03))
+        {
+            rx_busy = 0x03;
+            OEA &= 0xdf;
+            rx_bits_rcvd ++;
+            //fast_uart(0x33);
+            QueuePutTX(rx_buffer);
+
+
+            //Writing bits out via UART
+            if(rx_bits_rcvd < 9)
+            {
+              __asm
+                mov a, _rx_buffer;
+                mov c,_PA5;
+                rrc a;
+                mov _rx_buffer,a;
+              __endasm;
+            }
+            else
+            {
+             __asm
+                mov c,_PA5;
+              __endasm;
+                rx_bits_rcvd = 0;
+                rx_busy = 1;
+
+            }
+
+        }
+
+        rx_count = 0x00;
+
+
+}
+       //fast_uart(tx_count);
+        //fast_uart(tx_busy);
 
 //        //toggle_pins();
 //
