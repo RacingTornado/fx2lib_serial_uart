@@ -52,23 +52,23 @@ void timerlib_init(CLK_SPD clk)
         {
             to_load = (interval)/(83*4*3);
             to_load = 0xff - to_load;
-            fast_uart(to_load);
+            //fast_uart(to_load);
         }
         break;
         case CLK_24M:
         {
             to_load = (interval*1000)/(83*2*3);
             to_load = 0xff - to_load;
-            fast_uart(to_load);
+            //fast_uart(to_load);
         }
         break;
         case CLK_48M:
         {
             to_load = (interval);
-            fast_uart(0x34);
-            fast_uart(to_load);
+            //fast_uart(0x34);
+            //fast_uart(to_load);
             to_load = 0xff - to_load;
-            fast_uart(to_load);
+            //fast_uart(to_load);
 
         }
         break;

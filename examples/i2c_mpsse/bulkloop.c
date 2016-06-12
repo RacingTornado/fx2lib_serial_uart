@@ -26,10 +26,9 @@
 #include <setupdat.h>
 #include <eputils.h>
 #include <fx2ints.h>
-#include "softuart.h"
 #include "mpsse.h"
 #include "timer_lib.h"
-
+#include "softuart.h"
 #define SU_TRUE    1
 #define SU_FALSE   0
 
@@ -125,6 +124,29 @@ extern unsigned char tx_buffer;
 extern unsigned char rx_buffer;
 extern unsigned char tx_count;
 extern unsigned char rx_count;
+extern unsigned char tx_buffer;
+extern unsigned char rx_buffer;
+extern unsigned char tx_count;
+extern unsigned char rx_count;
+
+extern unsigned char tx_bits_sent;
+extern unsigned char rx_bits_sent;
+
+
+extern void QueueInitTX(void);
+extern __bit QueuePutTX(unsigned char data);
+extern __bit QueueGetTX(unsigned char *old);
+extern __bit QueueCheckTX();
+
+extern void QueueInitRX(void);
+extern __bit QueuePutRX(unsigned char data);
+extern __bit QueueGetRX(unsigned char *old);
+extern __bit QueueCheckRX();
+
+
+
+
+
 
 extern __xdata unsigned char send_tx[BUFFER_SIZE];
 extern __xdata unsigned char receive_rx[BUFFER_SIZE];
@@ -224,6 +246,7 @@ main ()
     service_timer();
     uart_rx_service();
     uart_tx_service();
+    QueuePutTX(0x44);
 //          if (qin != qout)
 //	{
 //	  softuart_putchar (inbuf[qout]);
@@ -444,9 +467,53 @@ sudav_isr ()
      void timer1_isr ()
      __interrupt TF1_ISR
      {
+    //LSB holds tick value
+    //MSH holds bit count
+    tx_count = tx_count + 1;
+
+    if( (tx_count % 4)  == 0)
+    {
+        //fast_uart(tx_count);
+        if((tx_count & 0x80))
+        {
+            OEA |= 0x10;
+
+            //Writing bits out via UART
+            if(tx_bits_sent == 0)
+            {
+                PA4 = 0 ;
+
+            }
+            if(tx_bits_sent > 0 )
+            {
+                __asm
+                mov a, _tx_count;
+                rrc a;
+                mov _PA4, c;
+                mov _tx_count,a;
+                __endasm;
+            }
+            if(tx_bits_sent == 8)
+            {
+                PA4 = 1;
+                tx_count = 0x00;
+                tx_bits_sent = 0;
+            }
+            tx_bits_sent ++;
+
+        }
+
+        tx_count = 0;
 
 
 
+
+
+
+
+
+
+    }
 
 
 //        //toggle_pins();
@@ -642,7 +709,7 @@ void call_me()
             cpl _PA3
             __endasm;
 
-    fast_uart(0x55);
+    //fast_uart(0x55);
 }
 
 

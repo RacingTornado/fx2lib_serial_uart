@@ -184,6 +184,10 @@ unsigned char tx_count;
 unsigned char rx_count;
 
 
+unsigned char tx_bits_sent;
+unsigned char rx_bits_sent;
+
+
 
 
 
@@ -579,17 +583,17 @@ void uart_tx_service()
 {
 //Data has been loaded by the calling function in a buffer
 //We need to move the data and set the flag
-QueuePutTX(0x33);
-QueueGetTX(&tx_buffer);
-fast_uart(tx_buffer);
+//QueuePutTX(0x33);
+//QueueGetTX(&tx_buffer);
+//fast_uart(tx_buffer);
 //Check if operation is ongoing
-if(QueueCheckTX()!= 1 && tx_count != 0x80 )
+if(QueueCheckTX()!= 1 && (tx_count & 0x80)!=1  )
 {
     //Load value
     QueueGetTX(tx_buffer);
     //Busy. Operation is ongoing
     //Clear bit 7  indicates that operation has completed.
-    tx_count  = 0x80;
+    tx_count  = 0x8a;
 
 }
 
@@ -603,7 +607,7 @@ if(QueueCheckTX()!= 1 && tx_count != 0x80 )
 void uart_rx_service()
 {
 
-if(QueueCheckRX()!= 1 && rx_count != 0x80 )
+if(QueueCheckRX()!= 1 && (rx_count & 0x80)!=1 )
 {
     //Load value
     QueueGetRX(rx_buffer);
@@ -682,9 +686,9 @@ __bit QueueGetTX(unsigned char *old)
 
 __bit QueueCheckTX()
 {
-    if(QueueInTX == QueueOutTX)
+        if(QueueInTX == (( QueueOutTX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
     {
-        return 1; /* Queue Empty - nothing to get*/
+        return 1; /* Queue Full*/
     }
     return 0; // No errors
 }
@@ -728,9 +732,9 @@ __bit QueueGetRX(unsigned char *old)
 
 __bit QueueCheckRX()
 {
-    if(QueueInRX == QueueOutRX)
+        if(QueueInRX == (( QueueOutRX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
     {
-        return 1; /* Queue Empty - nothing to get*/
+        return 1; /* Queue Full*/
     }
     return 0; // No errors
 }
