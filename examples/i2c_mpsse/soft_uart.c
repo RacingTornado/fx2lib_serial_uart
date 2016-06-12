@@ -331,7 +331,7 @@ void timer_init()
     SYNCDELAY;
     TR1 = 0;
     SYNCDELAY;
-    TH1 = 0x77;
+    TH1 = 0x9b;
     SYNCDELAY;
     TL1 = 0x77;
     SYNCDELAY;

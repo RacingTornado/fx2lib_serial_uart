@@ -134,7 +134,7 @@ void configure_timer() __critical
  SYNCDELAY;
  TR1 = 0;
  SYNCDELAY;
- TH1 = reload_value;
+ TH1 = 0xc3;
  SYNCDELAY;
  TL1 = 0x23;
  SYNCDELAY;

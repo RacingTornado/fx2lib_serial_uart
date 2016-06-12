@@ -485,7 +485,7 @@ sudav_isr ()
                 PA4 = 0 ;
 
             }
-            else if(tx_bits_sent > 1 && tx_bits_sent < 9)
+            else if(tx_bits_sent > 1 && tx_bits_sent <= 10)
             {
 //                __asm
 //                mov a, _tx_buffer;
