@@ -181,20 +181,28 @@ main ()
   periodic = 20;
   callback = call_me;
   create_timer();
+    //TR0=0;
+    //TMOD= 0x02;
+    //TH0 = 0xc0;
+    //TL0 = 0x40;
+    //TR0 = 1;
+    //ET0 = 1;
 
 
-
-
+//    while(TRUE)
+//    {
+//
+//    }
 
 
   //USBCS |= bmRENUM;
+  //TR0 = 0;
   while (TRUE)
     {
 
 
     service_timer();
-
-      if (qin != qout)
+          if (qin != qout)
 	{
 	  softuart_putchar (inbuf[qout]);
 	  putchar_a (inbuf[qout]);
@@ -244,7 +252,13 @@ main ()
 
 
 
+
+
     }
+
+
+
+
 
 }
 
