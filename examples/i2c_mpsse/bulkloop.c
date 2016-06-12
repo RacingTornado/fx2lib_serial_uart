@@ -404,8 +404,13 @@ sudav_isr ()
      __interrupt SUDAV_ISR
      {
 
-       toggle_pins ();
-       toggle_pins ();
+                                             __asm
+            mov _OEA, #0x08
+            cpl _PA3
+            __endasm;
+
+       //toggle_pins ();
+       //toggle_pins ();
        //toggle_pins ();
        //toggle_pins ();
 
@@ -638,10 +643,7 @@ uart_rx_fill ()
 void call_me()
 {
 
-                                        __asm
-            mov _OEA, #0x08
-            cpl _PA3
-            __endasm;
+
     //fast_uart(0x55);
     //uart_rcv_tx(0x00);
 
