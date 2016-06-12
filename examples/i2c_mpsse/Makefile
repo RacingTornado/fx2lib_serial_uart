@@ -45,7 +45,7 @@ USE_16K := 1
 # Must only be hex numbers
 FIRMWARE_VERSION := $(shell date +%Y%m%d)
 
-CC_SRCS := bulkloop.c uart_config.c descriptors.c timer_conf.c soft_uart.c toggle.c i2c_rw.c spi_rw.c mpsse_vendor.c timer_lib.c
+CC_SRCS := bulkloop.c uart_config.c descriptors.c timer_conf.c soft_uart.c toggle.c i2c_rw.c spi_rw.c mpsse_vendor.c 
 #Remove the assembly file now
 #AS_SRCS := descriptors_hdmi2usb.a51
 CC_OBJS := $(CC_SRCS:%.c=%.rel)
@@ -58,7 +58,7 @@ AS := $(AS8051)
 CFLAGS += -DDATE=0x$(FIRMWARE_VERSION) -mmcs51 $(FLAGS)
 
 ifeq ($(USE_16K),1)
-	CFLAGS += --code-size 0x3000 --xram-loc 0x3000 --xram-size 0x1000  -Wl"-b INT2JT=0x3d00"
+	CFLAGS += --code-size 0x3000 --xram-loc 0x3500 --xram-size 0x0200  -Wl"-b INT2JT=0x3100"
 else
 	CFLAGS += --code-size 0x1e00 --xram-size 0x0200 -Wl"-b DSCR_AREA=0x1e00" -Wl"-b INT2JT=0x1f00"
 endif
