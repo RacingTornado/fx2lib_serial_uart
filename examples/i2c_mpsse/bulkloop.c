@@ -520,11 +520,11 @@ if( (rx_count % 4)  == 0)
             OEA &= 0xdf;
             rx_bits_rcvd ++;
             //fast_uart(0x33);
-            QueuePutTX(rx_buffer);
+            //QueuePutTX(rx_buffer);
 
 
             //Writing bits out via UART
-            if(rx_bits_rcvd < 9)
+            if(rx_bits_rcvd < 10)
             {
               __asm
                 mov a, _rx_buffer;

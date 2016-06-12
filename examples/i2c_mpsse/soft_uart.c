@@ -634,9 +634,9 @@ if(rx_busy == 0x01 )
 //    QueueGetRX(rx_buffer);
     //QueuePutTX(QueueInRX);
     //QueuePutTX(QueueOutRX);
-    QueuePutTX(rx_buffer);
-    //QueuePutRX(rx_buffer);
     //QueuePutTX(rx_buffer);
+    //QueuePutRX(rx_buffer);
+    QueuePutTX(rx_buffer);
     //rx_count = 0x00;
     rx_busy = 0x00;
     //Busy. Operation is ongoing
