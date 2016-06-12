@@ -51,7 +51,7 @@
 #warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     16
+#define BUFFER_SIZE     4
 
 // Init the Software Uart
 void softuart_init(void);
@@ -86,5 +86,23 @@ void softuart_puts_p( const char *prg_s );
 
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
+
+
+
+
+void QueueInitTX(void);
+__bit QueuePutTX(unsigned char data);
+__bit QueueGetTX(unsigned char *old);
+__bit QueueCheckTX();
+
+void QueueInitRX(void);
+__bit QueuePutRX(unsigned char data);
+__bit QueueGetRX(unsigned char *old);
+__bit QueueCheckRX();
+
+
+
+
+
 #define softuart_puts_P(s___) softuart_puts_p(PSTR(s___))
 #endif

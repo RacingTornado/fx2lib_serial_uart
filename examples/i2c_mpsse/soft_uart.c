@@ -171,21 +171,39 @@ V0.4 (10/2010)
 
 // startbit and stopbit parsed internally (see ISR)
 #define RX_NUM_OF_BITS (8)
-volatile  char           inbuf[SOFTUART_IN_BUF_SIZE];
-volatile  unsigned char  qin;
-unsigned char           qout;
-volatile  unsigned char  flag_rx_off;
-volatile  unsigned char  flag_rx_ready;
 
 // 1 Startbit, 8 Databits, 1 Stopbit = 10 Bits/Frame
 #define TX_NUM_OF_BITS (10)
-volatile  unsigned char  flag_tx_busy;
-volatile  unsigned char  timer_tx_ctr;
-volatile  unsigned char  bits_left_in_tx;
-volatile  unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
 extern void set_tx_pin_high();
 //#define get_rx_pin_status()    ( SOFTUART_RXBIT )
+
+unsigned char tx_buffer;
+unsigned char rx_buffer;
+unsigned char tx_count;
+unsigned char rx_count;
+
+
+
+
+
+
+
+/* Queue structure */
+#define QUEUE_ELEMENTS 5
+#define QUEUE_SIZE (QUEUE_ELEMENTS + 1)
+__xdata unsigned char QueueTX[QUEUE_SIZE];
+__xdata unsigned char QueueInTX, QueueOutTX;
+
+__xdata unsigned char QueueRX[QUEUE_SIZE];
+__xdata unsigned char QueueInRX, QueueOutRX;
+
+
+
+
+
+
+
 
 //ISR(SOFTUART_T_COMP_LABEL)
 //{
@@ -330,15 +348,15 @@ void timer_init()
 
 void softuart_init( void )
 {
-	flag_tx_busy  = SU_FALSE;
-	flag_rx_ready = SU_FALSE;
-	flag_rx_off   = SU_FALSE;
 
 	set_tx_pin_high(); /* mt: set to high to avoid garbage on init */
 
 	io_init();
 	timer_init();
 	softuart_turn_rx_on();
+	QueueInitRX();
+	QueueInitTX();
+
 }
 
 static void idle(void)
@@ -350,48 +368,51 @@ static void idle(void)
 
 void softuart_turn_rx_on( void )
 {
-	flag_rx_off = SU_FALSE;
 }
 
 void softuart_turn_rx_off( void )
 {
-	flag_rx_off = SU_TRUE;
 }
 
 char softuart_getchar( void )
 {
-	char ch;
-    //Read back the data
-	while ( qout == qin ) {
-		//idle();
-		return 0x30;
-	}
-	ch = inbuf[qout];
-	if ( ++qout >= SOFTUART_IN_BUF_SIZE ) {
-		qout = 0;
-	}
-
-	return( ch );
+//	char ch;
+//    //Read back the data
+//	while ( qout == qin ) {
+//		//idle();
+//		return 0x30;
+//	}
+//	ch = inbuf[qout];
+//	if ( ++qout >= SOFTUART_IN_BUF_SIZE ) {
+//		qout = 0;
+//	}
+//
+//	return( ch );
 }
 
 unsigned char softuart_kbhit( void )
 {
-	return( qin != qout );
+//	return( qin != qout );
 }
 
 void softuart_flush_input_buffer( void )
 {
-	qin  = 0;
-	qout = 0;
+//	qin  = 0;
+//	qout = 0;
 }
 
 unsigned char softuart_transmit_busy( void )
 {
-	return ( flag_tx_busy == SU_TRUE ) ? 1 : 0;
+//	return ( flag_tx_busy == SU_TRUE ) ? 1 : 0;
 }
 
-void softuart_putchar( const char ch )
+void softuart_putchar( const char a)
 {
+
+
+
+
+
     //Keep waiting till current transmission is complete
 //	while ( flag_tx_busy == SU_TRUE ) {
 //		; // wait for transmitter ready
@@ -410,14 +431,14 @@ void softuart_putchar( const char ch )
 
 void softuart_puts( const char *s )
 {
-	while ( *s ) {
-		softuart_putchar( *s++ );
-	}
+//	while ( *s ) {
+//		softuart_putchar( *s++ );
+//	}
 }
 
 void softuart_puts_p( const char *prg_s )
 {
-	char c;
+//	char c;
 
 //	while ( ( c = pgm_read_byte( prg_s++ ) ) ) {
 //		softuart_putchar(c);
@@ -426,16 +447,16 @@ void softuart_puts_p( const char *prg_s )
 
 unsigned char get_rx_pin_status()
 {
-    unsigned char temp;
-
-    SYNCDELAY;
-    SYNCDELAY;
-    temp = IOA;
-    SYNCDELAY;
-    SYNCDELAY;
-    temp = temp >> 1;
-    temp = temp & 0x01;
-    return temp;
+//    unsigned char temp;
+//
+//    SYNCDELAY;
+//    SYNCDELAY;
+//    temp = IOA;
+//    SYNCDELAY;
+//    SYNCDELAY;
+//    temp = temp >> 1;
+//    temp = temp & 0x01;
+//    return temp;
 
 
   //return SOFTUART_RXBIT;
@@ -447,8 +468,8 @@ void set_tx_pin_high()
 //SOFTUART_TXBIT = 1;
 //PA0 = 1;
 //IOA = 0x01;
-PA0 = 1;
-SYNCDELAY;
+//PA0 = 1;
+//SYNCDELAY;
 }
 
 
@@ -456,11 +477,11 @@ void set_tx_pin_low()
 {
 //SOFTUART_TXBIT=0;
 //IOA=0x00;
-__asm
-mov 0xb2, #0x01
-clr 0x80
-__endasm;
-SYNCDELAY;
+//__asm
+//mov 0xb2, #0x01
+//clr 0x80
+//__endasm;
+//SYNCDELAY;
 }
 
 
@@ -551,6 +572,189 @@ void calculate_delay()
 
 
 }
+
+
+//This function is called periodically from main
+void uart_tx_service()
+{
+//Data has been loaded by the calling function in a buffer
+//We need to move the data and set the flag
+QueuePutTX(0x33);
+QueueGetTX(&tx_buffer);
+fast_uart(tx_buffer);
+//Check if operation is ongoing
+if(QueueCheckTX()!= 1 && tx_count != 0x80 )
+{
+    //Load value
+    QueueGetTX(tx_buffer);
+    //Busy. Operation is ongoing
+    //Clear bit 7  indicates that operation has completed.
+    tx_count  = 0x80;
+
+}
+
+
+
+
+}
+
+
+//Called periodically from main
+void uart_rx_service()
+{
+
+if(QueueCheckRX()!= 1 && rx_count != 0x80 )
+{
+    //Load value
+    QueueGetRX(rx_buffer);
+    //Busy. Operation is ongoing
+    //Clear bit 7  indicates that operation has completed.
+    rx_count  = 0x80;
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Very simple queue
+ * These are FIFO queues which discard the new data when full.
+ *
+ * Queue is empty when in == out.
+ * If in != out, then
+ *  - items are placed into in before incrementing in
+ *  - items are removed from out before incrementing out
+ * Queue is full when in == (out-1 + QUEUE_SIZE) % QUEUE_SIZE;
+ *
+ * The queue will hold QUEUE_ELEMENTS number of items before the
+ * calls to QueuePut fail.
+ */
+
+
+
+void QueueInitTX(void)
+{
+    QueueInTX = QueueOutTX = 0;
+}
+
+__bit QueuePutTX(unsigned char data)
+{
+    if(QueueInTX == (( QueueOutTX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
+    {
+        return 1; /* Queue Full*/
+    }
+
+    QueueTX[QueueInTX] = data;
+
+    QueueInTX = (QueueInTX + 1) % QUEUE_SIZE;
+
+    return 0; // No errors
+}
+
+__bit QueueGetTX(unsigned char *old)
+{
+    if(QueueInTX == QueueOutTX)
+    {
+        return 1; /* Queue Empty - nothing to get*/
+    }
+
+    *old = QueueTX[QueueOutTX];
+
+    QueueOutTX = (QueueOutTX + 1) % QUEUE_SIZE;
+
+    return 0; // No errors
+}
+
+
+__bit QueueCheckTX()
+{
+    if(QueueInTX == QueueOutTX)
+    {
+        return 1; /* Queue Empty - nothing to get*/
+    }
+    return 0; // No errors
+}
+
+
+
+
+void QueueInitRX(void)
+{
+    QueueInRX = QueueOutRX = 0;
+}
+
+__bit QueuePutRX(unsigned char data)
+{
+    if(QueueInRX == (( QueueOutRX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
+    {
+        return 1; /* Queue Full*/
+    }
+
+    QueueRX[QueueInRX] = data;
+
+    QueueInRX = (QueueInRX + 1) % QUEUE_SIZE;
+
+    return 0; // No errors
+}
+
+__bit QueueGetRX(unsigned char *old)
+{
+    if(QueueInRX == QueueOutRX)
+    {
+        return 1; /* Queue Empty - nothing to get*/
+    }
+
+    *old = QueueRX[QueueOutRX];
+
+    QueueOutRX = (QueueOutRX + 1) % QUEUE_SIZE;
+
+    return 0; // No errors
+}
+
+
+__bit QueueCheckRX()
+{
+    if(QueueInRX == QueueOutRX)
+    {
+        return 1; /* Queue Empty - nothing to get*/
+    }
+    return 0; // No errors
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

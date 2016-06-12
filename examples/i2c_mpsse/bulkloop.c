@@ -107,19 +107,34 @@ extern void create_timer();
 void call_me();
 extern void service_timer();
 extern void timer_start();
+extern void uart_tx_service();
+extern void uart_rx_service();
 
-extern volatile unsigned char flag_tx_busy;
-extern volatile unsigned char timer_tx_ctr;
-extern volatile unsigned short internal_tx_buffer;
-extern volatile unsigned char bits_left_in_tx;
 
-extern volatile unsigned char flag_rx_off;
-extern volatile unsigned char flag_rx_ready;
-extern unsigned char qout;
-extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
-extern volatile unsigned char qin;
+
+
+
 extern __xdata unsigned char interval;
 extern __xdata unsigned short periodic;
+
+
+
+
+
+extern unsigned char tx_buffer;
+extern unsigned char rx_buffer;
+extern unsigned char tx_count;
+extern unsigned char rx_count;
+
+extern __xdata unsigned char send_tx[BUFFER_SIZE];
+extern __xdata unsigned char receive_rx[BUFFER_SIZE];
+
+
+
+
+
+
+
 
 extern  __xdata  volatile unsigned short fx2_tick ;
 extern  void (*callback)();
@@ -207,6 +222,8 @@ main ()
 
 
     service_timer();
+    uart_rx_service();
+    uart_tx_service();
 //          if (qin != qout)
 //	{
 //	  softuart_putchar (inbuf[qout]);
