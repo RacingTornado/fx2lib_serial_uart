@@ -50,26 +50,8 @@ volatile __bit got_sud;
 volatile unsigned char anotherone;
 DWORD lcount;
 __bit on;
-static unsigned char flag_rx_waiting_for_stop_bit = SU_FALSE;
-static unsigned char rx_mask;
-
-static unsigned char timer_rx_ctr;
-static unsigned char bits_left_in_rx;
-static unsigned char internal_rx_buffer;
-
-unsigned char start_bit, flag_in;
-unsigned char pin_data;
-unsigned char buf_data;
-unsigned char bit_number;
-unsigned char pin_state;
 
 
-typedef enum
-{
-  START_BIT = 2,
-  DATA,
-  STOP_BIT
-} uart_state_rx;
 
 extern void uart_config ();
 extern void ProcessXmitData ();
@@ -120,17 +102,14 @@ extern __xdata unsigned short periodic;
 
 
 
-extern unsigned char tx_buffer;
-extern unsigned char rx_buffer;
-extern unsigned char tx_count;
-extern unsigned char rx_count;
-extern unsigned char tx_buffer;
-extern unsigned char rx_buffer;
-extern unsigned char tx_count;
-extern unsigned char rx_count;
+extern unsigned char volatile tx_buffer;
+extern unsigned char volatile rx_buffer;
+extern unsigned char volatile tx_count;
+extern unsigned char volatile rx_count;
 
-extern unsigned char tx_bits_sent;
-extern unsigned char rx_bits_sent;
+extern unsigned char volatile tx_bits_sent;
+extern unsigned char volatile rx_bits_sent;
+extern unsigned char volatile tx_busy;
 
 
 extern void QueueInitTX(void);
@@ -164,7 +143,7 @@ extern  void (*callback)();
 
 
 
-uart_state_rx rx_state;
+
 
 void
 main ()
@@ -187,7 +166,7 @@ main ()
 
 
 
-  rx_state = START_BIT;
+  //rx_state = START_BIT;
   configure_drive (0xb0, 0);
 
   //i2c_bitbang();
@@ -239,14 +218,18 @@ main ()
   //USBCS |= bmRENUM;
   //TR0 = 0;
   TR0 =1 ;
+
+
+
   while (TRUE)
     {
 
 
     service_timer();
-    uart_rx_service();
+    QueuePutTX(0x55);
+    //uart_rx_service();
     uart_tx_service();
-    QueuePutTX(0x44);
+
 //          if (qin != qout)
 //	{
 //	  softuart_putchar (inbuf[qout]);
@@ -471,58 +454,46 @@ sudav_isr ()
     //MSH holds bit count
     tx_count = tx_count + 1;
 
+
     if( (tx_count % 4)  == 0)
     {
         //fast_uart(tx_count);
-        if((tx_count & 0x80))
+        //fast_uart(tx_busy);
+
+        if(tx_busy == 0x01)
         {
             OEA |= 0x10;
             tx_bits_sent ++;
+            //fast_uart(0x33);
 
             //Writing bits out via UART
             if(tx_bits_sent == 1)
             {
                 PA4 = 0 ;
 
+
             }
             else if(tx_bits_sent > 1 && tx_bits_sent <= 10)
             {
-//                __asm
-//                mov a, _tx_buffer;
-//                rrc a;
-//                mov _PA4, c;
-//                mov _tx_buffer,a;
-//                __endasm;
-                PA4 = 1;
+                __asm
+                mov a, _tx_buffer;
+                rrc a;
+                mov _PA4, c;
+                mov _tx_buffer,a;
+                __endasm;
+//                PA4 = 1;
             }
             else
             {
                 PA4 = 1;
                 tx_bits_sent = 0;
+                tx_busy = 0;
+
             }
-
-            if((tx_bits_sent == 0) &&  (tx_count&0x80))
-                {
-                    tx_count = 0;
-                }
-            else
-                {
-                    tx_count = 0x80;
-                }
-
-
         }
-
-
-
-
-
-
-
-
-
-
+        tx_count = 0x00;
     }
+
 
 
 //        //toggle_pins();
@@ -680,34 +651,34 @@ void
 uart_rx_fill ()
 {
 
-  switch (rx_state)
-    {
-    case START_BIT:
-      if (pin_data == 0)
-	{
-	  rx_state = DATA;
-	  toggle_port_value (0xb0, 1);
-	}
-      bit_number = 0;
-      break;
-    case DATA:
-      pin_data |= (pin_data << bit_number);
-      bit_number = bit_number + 1;
-      if (bit_number == 8)
-	{
-	  rx_state = STOP_BIT;
-	}
-      break;
-    case STOP_BIT:
-      if (pin_data == 1)
-	{
-	  buf_data = pin_data;
-	  softuart_putchar (buf_data);
-	  rx_state = START_BIT;
-	}
-      break;
-    }
-
+//  switch (rx_state)
+//    {
+//    case START_BIT:
+//      if (pin_data == 0)
+//	{
+//	  rx_state = DATA;
+//	  toggle_port_value (0xb0, 1);
+//	}
+//      bit_number = 0;
+//      break;
+//    case DATA:
+//      pin_data |= (pin_data << bit_number);
+//      bit_number = bit_number + 1;
+//      if (bit_number == 8)
+//	{
+//	  rx_state = STOP_BIT;
+//	}
+//      break;
+//    case STOP_BIT:
+//      if (pin_data == 1)
+//	{
+//	  buf_data = pin_data;
+//	  softuart_putchar (buf_data);
+//	  rx_state = START_BIT;
+//	}
+//      break;
+//    }
+//
 
 }
 

@@ -178,15 +178,15 @@ V0.4 (10/2010)
 extern void set_tx_pin_high();
 //#define get_rx_pin_status()    ( SOFTUART_RXBIT )
 
-unsigned char tx_buffer;
-unsigned char rx_buffer;
-unsigned char tx_count;
-unsigned char rx_count;
+unsigned char volatile tx_buffer;
+unsigned char volatile rx_buffer;
+unsigned char volatile tx_count;
+unsigned char volatile rx_count;
 
 
-unsigned char tx_bits_sent;
-unsigned char rx_bits_sent;
-
+unsigned volatile char tx_bits_sent;
+unsigned volatile char rx_bits_sent;
+unsigned char volatile tx_busy;
 
 
 
@@ -331,9 +331,9 @@ void timer_init()
     SYNCDELAY;
     TR1 = 0;
     SYNCDELAY;
-    TH1 = 0x9b;
+    TH1 = 0x97;
     SYNCDELAY;
-    TL1 = 0x77;
+    TL1 = 0x97;
     SYNCDELAY;
 
 
@@ -360,6 +360,7 @@ void softuart_init( void )
 	softuart_turn_rx_on();
 	QueueInitRX();
 	QueueInitTX();
+	tx_busy = 0;
 
 }
 
@@ -587,13 +588,25 @@ void uart_tx_service()
 //QueueGetTX(&tx_buffer);
 //fast_uart(tx_buffer);
 //Check if operation is ongoing
-if(QueueCheckTX()!= 1 && (tx_count & 0x80)!=1  )
+
+
+
+
+if( QueueCheckTX()!= 1)
 {
-    //Load value
-    QueueGetTX(tx_buffer);
-    //Busy. Operation is ongoing
-    //Clear bit 7  indicates that operation has completed.
-    tx_count  = 0x8a;
+
+
+    if( tx_busy == 0 )
+    {
+     //fast_uart(tx_count);
+
+
+        //Load value
+        QueueGetTX(&tx_buffer);
+        //Busy. Operation is ongoing
+        //Clear bit 7  indicates that operation has completed.
+        tx_busy = 1;
+    }
 
 }
 
@@ -610,10 +623,10 @@ void uart_rx_service()
 if(QueueCheckRX()!= 1 && (rx_count & 0x80)!=1 )
 {
     //Load value
-    QueueGetRX(rx_buffer);
+//    QueueGetRX(rx_buffer);
     //Busy. Operation is ongoing
     //Clear bit 7  indicates that operation has completed.
-    rx_count  = 0x80;
+//    rx_count  = 0x80;
 
 }
 
@@ -671,7 +684,7 @@ __bit QueuePutTX(unsigned char data)
 
 __bit QueueGetTX(unsigned char *old)
 {
-    if(QueueInTX == QueueOutTX)
+    if((QueueInTX == QueueOutTX))
     {
         return 1; /* Queue Empty - nothing to get*/
     }
@@ -686,10 +699,16 @@ __bit QueueGetTX(unsigned char *old)
 
 __bit QueueCheckTX()
 {
-        if(QueueInTX == (( QueueOutTX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
+
+        //fast_uart(QueueInTX);
+        //        fast_uart(QueueOutTX);
+
+
+        if((QueueInTX == QueueOutTX))
     {
-        return 1; /* Queue Full*/
+        return 1; /* Queue Empty - nothing to get*/
     }
+
     return 0; // No errors
 }
 
@@ -732,9 +751,9 @@ __bit QueueGetRX(unsigned char *old)
 
 __bit QueueCheckRX()
 {
-        if(QueueInRX == (( QueueOutRX - 1 + QUEUE_SIZE) % QUEUE_SIZE))
+        if((QueueInTX == QueueOutTX))
     {
-        return 1; /* Queue Full*/
+        return 1; /* Queue Empty - nothing to get*/
     }
     return 0; // No errors
 }
