@@ -477,33 +477,42 @@ sudav_isr ()
         if((tx_count & 0x80))
         {
             OEA |= 0x10;
+            tx_bits_sent ++;
 
             //Writing bits out via UART
-            if(tx_bits_sent == 0)
+            if(tx_bits_sent == 1)
             {
                 PA4 = 0 ;
 
             }
-            if(tx_bits_sent > 0 )
+            else if(tx_bits_sent > 1 && tx_bits_sent < 9)
             {
-                __asm
-                mov a, _tx_count;
-                rrc a;
-                mov _PA4, c;
-                mov _tx_count,a;
-                __endasm;
+//                __asm
+//                mov a, _tx_buffer;
+//                rrc a;
+//                mov _PA4, c;
+//                mov _tx_buffer,a;
+//                __endasm;
+                PA4 = 1;
             }
-            if(tx_bits_sent == 8)
+            else
             {
                 PA4 = 1;
-                tx_count = 0x00;
                 tx_bits_sent = 0;
             }
-            tx_bits_sent ++;
+
+            if((tx_bits_sent == 0) &&  (tx_count&0x80))
+                {
+                    tx_count = 0;
+                }
+            else
+                {
+                    tx_count = 0x80;
+                }
+
 
         }
 
-        tx_count = 0;
 
 
 
