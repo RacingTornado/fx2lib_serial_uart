@@ -214,7 +214,7 @@ main ()
   while (TRUE)
     {
 
-
+    fast_uart(0x23);
     service_timer();
     //fast_uart(0x45);
 
