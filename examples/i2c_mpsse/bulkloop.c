@@ -42,83 +42,14 @@
 #define REARM() EP2BCL=REARMVAL
 
 
-
-
 volatile WORD bytes;
 volatile __bit gotbuf;
 volatile BYTE icount;
 volatile __bit got_sud;
-volatile unsigned char anotherone;
 DWORD lcount;
 __bit on;
-static unsigned char flag_rx_waiting_for_stop_bit = SU_FALSE;
-static unsigned char rx_mask;
-
-static unsigned char timer_rx_ctr;
-static unsigned char bits_left_in_rx;
-static unsigned char internal_rx_buffer;
-
-unsigned char start_bit, flag_in;
-unsigned char pin_data;
-unsigned char buf_data;
-unsigned char bit_number;
-unsigned char pin_state;
-//static __xdata unsigned char i;
 
 
-typedef enum
-{
-  START_BIT = 2,
-  DATA,
-  STOP_BIT
-} uart_state_rx;
-
-extern void uart_config ();
-extern void ProcessXmitData ();
-extern void ProcessRecvData ();
-extern void toggle_pins ();
-extern void configure_timer ();
-extern void start_timer ();
-extern void timer_init ();
-extern void set_tx_pin_high ();
-extern void set_tx_pin_low ();
-extern unsigned char get_rx_pin_status ();
-extern void configure_drive (unsigned char a, unsigned char b);
-extern void toggle_port_value (unsigned char a, unsigned char b);
-extern void uart_rx_fill ();
-extern void putchar_a (char a);
-
-extern void i2c_addr_logic ();
-extern char i2c_data_logic (unsigned char dummyportenselect);
-extern void i2c_stop_logic ();
-
-extern void spi_data_logic (unsigned char mosi_data_a,
-			    unsigned char master_pin_a);
-extern void spi_mosi_data_logic ();
-extern void spi_miso_data_logic ();
-extern void fast_uart(unsigned char a);
-extern void set_resp(unsigned char a);
-
-
-extern void temp_call ();
-extern char xxy (char a, char b);
-extern BOOL handle_mpsse ();
-extern void timerlib_init(CLK_SPD clk);
-extern void create_timer();
-void call_me();
-extern void service_timer();
-extern void timer_start();
-
-extern volatile unsigned char flag_tx_busy;
-extern volatile unsigned char timer_tx_ctr;
-extern volatile unsigned short internal_tx_buffer;
-extern volatile unsigned char bits_left_in_tx;
-
-extern volatile unsigned char flag_rx_off;
-extern volatile unsigned char flag_rx_ready;
-extern unsigned char qout;
-extern volatile char inbuf[SOFTUART_IN_BUF_SIZE];
-extern volatile unsigned char qin;
 //extern __xdata unsigned char interval;
 //extern __xdata unsigned short periodic;
 //extern __xdata struct timer fx2_timer[MAX_TIMERS];
@@ -141,7 +72,7 @@ extern volatile unsigned char qin;
 
 
 
-uart_state_rx rx_state;
+//uart_state_rx rx_state;
 
 void
 main ()
@@ -174,9 +105,9 @@ main ()
 
   //d();
 
-  //SETCPUFREQ(CLK_48M);
+  SETCPUFREQ(CLK_48M);
   //SETIF48MHZ();
-  //sio0_init (57600);
+  sio0_init (57600);
 
   //Enable USB auto vectored interrupts
   USE_USB_INTS ();
@@ -298,7 +229,7 @@ handle_vendorcommand (BYTE cmd)
     case VC_EPSTAT:
       {
 	__xdata BYTE *pep = ep_addr (SETUPDAT[2]);
-	printf ("ep %02x\n", *pep);
+	//printf ("ep %02x\n", *pep);
 	if (pep)
 	  {
 	    EP0BUF[0] = *pep;
@@ -310,8 +241,8 @@ handle_vendorcommand (BYTE cmd)
       break;
 
     default:
-      handle_mpsse ();
-      printf ("Need to implement vendor command: %02x\n", cmd);
+      //handle_mpsse ();
+      //printf ("Need to implement vendor command: %02x\n", cmd);
     }
   return FALSE;
 }
@@ -345,7 +276,7 @@ handle_get_interface (BYTE ifc, BYTE * alt_ifc)
 BOOL
 handle_set_interface (BYTE ifc, BYTE alt_ifc)
 {
-  printf ("Set interface %d to alt: %d\n", ifc, alt_ifc);
+  //printf ("Set interface %d to alt: %d\n", ifc, alt_ifc);
 
   if (ifc == 0 && alt_ifc == 0)
     {
@@ -420,7 +351,7 @@ sudav_isr ()
        //toggle_pins ();
 
        got_sud = TRUE;
-       anotherone++;
+       //anotherone++;
        CLEAR_SUDAV ();
      }
 
@@ -613,33 +544,6 @@ void
 uart_rx_fill ()
 {
 
-  switch (rx_state)
-    {
-    case START_BIT:
-      if (pin_data == 0)
-	{
-	  rx_state = DATA;
-	  toggle_port_value (0xb0, 1);
-	}
-      bit_number = 0;
-      break;
-    case DATA:
-      pin_data |= (pin_data << bit_number);
-      bit_number = bit_number + 1;
-      if (bit_number == 8)
-	{
-	  rx_state = STOP_BIT;
-	}
-      break;
-    case STOP_BIT:
-      if (pin_data == 1)
-	{
-	  buf_data = pin_data;
-	  softuart_putchar (buf_data);
-	  rx_state = START_BIT;
-	}
-      break;
-    }
 
 
 }

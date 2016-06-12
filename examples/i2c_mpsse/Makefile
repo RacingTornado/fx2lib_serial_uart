@@ -45,7 +45,7 @@ USE_16K := 1
 # Must only be hex numbers
 FIRMWARE_VERSION := $(shell date +%Y%m%d)
 
-CC_SRCS := bulkloop.c uart_config.c descriptors.c timer_conf.c soft_uart.c toggle.c i2c_rw.c spi_rw.c mpsse_vendor.c 
+CC_SRCS := bulkloop.c  descriptors.c 
 #Remove the assembly file now
 #AS_SRCS := descriptors_hdmi2usb.a51
 CC_OBJS := $(CC_SRCS:%.c=%.rel)
