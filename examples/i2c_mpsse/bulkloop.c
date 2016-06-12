@@ -189,12 +189,12 @@ main ()
   set_resp(0x02);
 
   //5us interval
-  interval = 60;
-  timerlib_init(CLK_48M);
-  timer_start();
-  periodic = 200;
-  callback = call_me;
-  create_timer();
+  //interval = 60;
+  //timerlib_init(CLK_48M);
+  //timer_start();
+  //periodic = 200;
+  //callback = call_me;
+  //create_timer();
     //TR0=0;
     //TMOD= 0x02;
     //TH0 = 0xc0;
@@ -215,7 +215,7 @@ main ()
     {
 
 
-    service_timer();
+    //service_timer();
     //fast_uart(0x45);
 
 //      if (qin != qout)
@@ -638,10 +638,7 @@ uart_rx_fill ()
 void call_me()
 {
 
-                                        __asm
-            mov _OEA, #0x08
-            cpl _PA3
-            __endasm;
+
     //fast_uart(0x55);
     //uart_rcv_tx(0x00);
 

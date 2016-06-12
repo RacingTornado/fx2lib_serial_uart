@@ -147,7 +147,7 @@ void configure_timer() __critical
 void start_timer()
 {
 
-    //TR1=1;
+    TR1=1;
     SYNCDELAY;
 
 }
