@@ -393,19 +393,19 @@ unsigned char softuart_transmit_busy( void )
 void softuart_putchar( const char ch )
 {
     //Keep waiting till current transmission is complete
-	while ( flag_tx_busy == SU_TRUE ) {
-		; // wait for transmitter ready
-		  // add watchdog-reset here if needed;
-	}
-
-	// invoke_UART_transmit
-	timer_tx_ctr       = 3;
-	//Set the number of bits to 10.
-	bits_left_in_tx    = TX_NUM_OF_BITS;
-	//This is to construct the 10 bits which will be sent out via serial
-	internal_tx_buffer = ( ch << 1 ) | 0x200;
-	//The tx_busy flag indicates that a transmit is in progress
-	flag_tx_busy       = SU_TRUE;
+//	while ( flag_tx_busy == SU_TRUE ) {
+//		; // wait for transmitter ready
+//		  // add watchdog-reset here if needed;
+//	}
+//
+//	// invoke_UART_transmit
+//	timer_tx_ctr       = 3;
+//	//Set the number of bits to 10.
+//	bits_left_in_tx    = TX_NUM_OF_BITS;
+//	//This is to construct the 10 bits which will be sent out via serial
+//	internal_tx_buffer = ( ch << 1 ) | 0x200;
+//	//The tx_busy flag indicates that a transmit is in progress
+//	flag_tx_busy       = SU_TRUE;
 }
 
 void softuart_puts( const char *s )
