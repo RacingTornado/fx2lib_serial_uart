@@ -74,18 +74,13 @@ void handle_setupdata() {
 
 
 
- if(SETUPDAT[0]==0x40)
+ if(SETUPDAT[0]==0x40 || SETUPDAT[0]==0xc0)
  {
 
  handle_vendorcommand(SETUPDAT[1]);
 
  }
 
-
-else if(SETUPDAT[0]==0xc0)
-{
-handle_vendorcommand(SETUPDAT[1]);
-}
  else
  {
 

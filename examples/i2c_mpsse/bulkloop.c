@@ -306,28 +306,30 @@ BOOL
 handle_vendorcommand (BYTE cmd)
 {
 
-  switch (cmd)
-    {
+handle_mpsse ();
 
-    case VC_EPSTAT:
-      {
-	__xdata BYTE *pep = ep_addr (SETUPDAT[2]);
-	printf ("ep %02x\n", *pep);
-	if (pep)
-	  {
-	    EP0BUF[0] = *pep;
-	    EP0BCH = 0;
-	    EP0BCL = 1;
-	    return TRUE;
-	  }
-      }
-      break;
-
-    default:
-      handle_mpsse ();
-      printf ("Need to implement vendor command: %02x\n", cmd);
-    }
-  return FALSE;
+//  switch (cmd)
+//    {
+//
+//    case VC_EPSTAT:
+//      {
+//	__xdata BYTE *pep = ep_addr (SETUPDAT[2]);
+//	printf ("ep %02x\n", *pep);
+//	if (pep)
+//	  {
+//	    EP0BUF[0] = *pep;
+//	    EP0BCH = 0;
+//	    EP0BCL = 1;
+//	    return TRUE;
+//	  }
+//      }
+//      break;
+//
+//    default:
+//      handle_mpsse ();
+//      printf ("Need to implement vendor command: %02x\n", cmd);
+//    }
+//  return FALSE;
 }
 
 

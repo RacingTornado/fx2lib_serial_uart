@@ -36,10 +36,36 @@ for(k=0;k<10;k++)
 }
 
 //SUDPTRCTL = 0x01;
-        switch (SETUPDAT[1])
-        {
 
-        case MPSSE_BITBANG:
+
+        /*
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_RESET   | switch off bitbang mode, back to regular serial/FIFO               |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_BITBANG | classical asynchronous bitbang mode, introduced with B-type chips  |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_MPSSE   | MPSSE mode, available on 2232x chips                               |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_SYNCBB  | synchronous bitbang mode, available on 2232x and R-type chips      |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_MCU     | MCU Host Bus Emulation mode, available on 2232x chips              |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_OPTO    | Fast Opto-Isolated Serial Interface Mode, available on 2232x chips |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_CBUS    | Bitbang on CBUS pins of R-type chips, configure in EEPROM before   |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_SYNCFF  | Single Channel Synchronous FIFO mode, available on 2232H chips     |  |
+        +-----------------+--------------------------------------------------------------------+--+
+        | BITMODE_FT1284  | FT1284 mode, available on 232H chips                               |  |
+        +-----------------+--------------------------------------------------------------------+--+
+
+        */
+
+       switch (SETUPDAT[1])
+        {
+        //Not really sure why this bmRequest is being issue. Just ack it anyway
+        //This is also the value for bmRequest when an FTDI_RESET is requested
+        case FTDI_RESET:
             {
 
                 //EP0CS |= 0x80;
@@ -54,7 +80,7 @@ for(k=0;k<10;k++)
                 EP0CS |= 0x80;
             }
             break;
-
+        //This is also issued as part of the ftdi_open_device. ACK it anyway without looking at data
         case MPSSE_TWO:
         {
                 EP0CS |= 0x80;
@@ -65,8 +91,9 @@ for(k=0;k<10;k++)
                 SUDPTRL = 2;
         }
         break;
-
-        case MPSSE_THREE:
+        //This is generally packet number 4 which is for setting latency
+        //Ignore this packet too. Just clear so it can be acked.
+        case SET_LATENCY:
         {
             EP0BUF[0]=1;
             EP0BUF[1]=2;
@@ -78,8 +105,21 @@ for(k=0;k<10;k++)
         }
         break;
 
-        case MPSSE_FOUR:
+        //This is packet number 4. This defines the FTDI bitbang mode.
+        //0x0b enables bitbang mode
+        /*
+        int ftdi_set_bitmode 	( 	struct ftdi_context *  	ftdi,
+		unsigned char  	bitmask,
+		unsigned char  	mode
+	   )
+	   */
+	   //TODO
+	   //We need to examine the bitmask to set the OEA register
+
+        case SIO_SET_BITMODE_REQUEST:
         {
+
+
             EP0BUF[0]= 0;
             EP0BUF[1] = 1;
             EP0BCH = 0;

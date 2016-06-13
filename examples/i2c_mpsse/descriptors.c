@@ -55,7 +55,7 @@ __code __at(0x3e00) struct usb_descriptors code_descriptors = {
 			{
 				.bLength		= USB_DT_ENDPOINT_SIZE,
 				.bDescriptorType 	= USB_DT_ENDPOINT,
-				.bEndpointAddress	= USB_ENDPOINT_NUMBER(0x1) | USB_DIR_OUT,
+				.bEndpointAddress	= USB_ENDPOINT_NUMBER(0x2) | USB_DIR_OUT,
 				.bmAttributes		= USB_ENDPOINT_XFER_BULK,
 				.wMaxPacketSize		= 512,
 				.bInterval		= 0,
@@ -63,7 +63,7 @@ __code __at(0x3e00) struct usb_descriptors code_descriptors = {
 			{
 				.bLength		= USB_DT_ENDPOINT_SIZE,
 				.bDescriptorType 	= USB_DT_ENDPOINT,
-				.bEndpointAddress	= USB_ENDPOINT_NUMBER(0x1) | USB_DIR_IN,
+				.bEndpointAddress	= USB_ENDPOINT_NUMBER(0x2) | USB_DIR_IN,
 				.bmAttributes		= USB_ENDPOINT_XFER_BULK,
 				.wMaxPacketSize		= 512,
 				.bInterval		= 0,
