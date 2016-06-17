@@ -50,6 +50,35 @@ volatile __bit got_sud;
 volatile unsigned char anotherone;
 DWORD lcount;
 __bit on;
+enum i2c_states
+        {
+idle, //0
+start,//1
+address,//2
+address_ack,//3
+data,//4
+data_write,//5
+data_write_ack,//6
+data_read,//7
+data_read_ack,//8
+stop//9
+        };
+
+enum i2c_state my_i2c_states;
+unsigned volatile char i2c_start;
+
+
+unsigned volatile char i2c_start;
+unsigned volatile char tx_i2c_bits;
+unsigned volatile char data_rw_bit;
+unsigned volatile char tx_i2c_buffer_load;
+unsigned volatile char tx_i2c_buffer;
+unsigned volatile char ack_bit;
+unsigned volatile char data_pending_bit;
+unsigned volatile char i2c_stop;
+unsigned volatile char data_ack;
+unsigned volatile char ack_bit;
+unsigned volatile char rx_i2c_buffer;
 
 
 
@@ -453,6 +482,236 @@ sudav_isr ()
      void timer1_isr ()
      __interrupt TF1_ISR
      {
+
+
+
+
+    if ( my_i2c_states == start )
+    {
+        //Send the start bit. Need to send SDA and SCL
+        OEA |= 0xC0;
+        PA7 = 0 ;
+        my_i2c_states = address;
+        tx_i2c_buffer_load  = 0x01;
+    }
+
+    else if ( my_i2c_states == address )
+    {
+        //Check the count of address bits and send remaining bits. After eight bits go to read mode for ACK
+        OEA |= 0xC0;
+        PA6 = 0;
+        tx_i2c_bits ++;
+        if(tx_i2c_bits > 7)
+        {
+            my_i2c_states = address_ack;
+            tx_i2c_bits = 0x00;
+            __asm
+            mov _data_rw_bit, c
+            __endasm;
+
+        }
+        __asm
+        mov a, _tx_i2c_buffer;
+        rlc a;
+        mov _PA7, c;
+        mov _tx_i2c_buffer,a;
+        __endasm;
+        PA6 = 1;
+
+    }
+    else if ( my_i2c_states == address_ack )
+    {
+        //Read the ACK bit; Go back to address if NAK-ed. Else to data
+        PA6 = 0;
+        OEA |= 0x40;
+        __asm
+        mov c, _PA7
+        jc 6200$;
+            mov a , _data_rw_bit;
+            rrc a;
+                    jc 6201$;
+                    mov _my_i2c_states,#0x07;
+                    ajmp 6202$;
+                6201$:
+                    mov _my_i2c_states,#0x05;
+                    ajmp 6202$;
+        6200$:
+            mov _my_i2c_states, #0x02;
+        6202$:
+        setb _PA6;
+        __endasm;
+
+    }
+    else if ( my_i2c_states == data_write)
+    {
+
+         //Check the count of address bits and send remaining bits. After eight bits go to read mode for ACK
+        OEA |= 0xC0;
+        PA6 = 0;
+        tx_i2c_bits ++;
+        if(tx_i2c_bits > 7)
+        {
+            my_i2c_states = data_write_ack;
+            tx_i2c_bits = 0x00;
+
+        }
+        __asm
+        mov a, _tx_data_buffer;
+        rlc a;
+        mov _PA7, c;
+        mov _tx_data_buffer,a;
+        __endasm;
+        PA6 = 1;
+
+
+    }
+    else if ( my_i2c_states == data_read)
+    {
+        //Check the count of data bits and receive remaining bits. After eight bits go for data read ACK
+        OEA |= 0x40;
+        tx_i2c_bits ++;
+        if(tx_i2c_bits > 7)
+        {
+            my_i2c_states = data_read_ack;
+            tx_i2c_bits = 0x00;
+        }
+        else
+        {
+            __asm
+            mov a, _rx_i2c_buffer;
+            mov c,_PA5;
+            rrc a;
+            mov _rx_i2c_buffer,a;
+            __endasm;
+        }
+    }
+    else if ( my_i2c_states == data_write_ack )
+    {
+        //Read the ACK bit; Go back to previous data if NAK-ed. Else to next data if present. Else go to stop
+        OEA |= 0x40;
+        PA6 = 0;
+        __asm
+        mov c, _PA7
+        jc 6203$;
+        mov _my_i2c_states, #0x05;
+        6203$:
+        mov _my_i2c_states,#0x09;
+        setb _PA6;
+        __endasm;
+
+
+    }
+    else if ( my_i2c_states == data_read_ack )
+    {
+        //Send the ACK bit. No multiple reads considered.
+        OEA |= 0xC0;
+        __asm
+         clr _PA7;
+        __endasm;
+        my_i2c_states = stop;
+    }
+    else if ( my_i2c_states == stop )
+    {
+        //Send the stop bit
+        OEA |= 0xC0;
+        PA6 = 1 ;
+        PA7 = 1 ;
+        my_i2c_states = idle;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //LSB holds tick value
     //MSH holds bit count
     tx_count = tx_count + 1;
